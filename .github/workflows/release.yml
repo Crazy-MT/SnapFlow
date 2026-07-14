@@ -20,9 +20,6 @@ jobs:
     runs-on: macos-latest
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
-      ARCHIVE_PATH: ${{ runner.temp }}/SnapFlow.xcarchive
-      EXPORT_PATH: ${{ runner.temp }}/SnapFlow-release
-      ZIP_PATH: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}.zip
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,6 +32,8 @@ jobs:
           xcode-version: latest-stable
 
       - name: Build archive
+        env:
+          ARCHIVE_PATH: ${{ runner.temp }}/SnapFlow.xcarchive
         run: |
           set -euo pipefail
           xcodebuild archive \
@@ -51,6 +50,10 @@ jobs:
             SKIP_INSTALL=NO
 
       - name: Package app
+        env:
+          ARCHIVE_PATH: ${{ runner.temp }}/SnapFlow.xcarchive
+          EXPORT_PATH: ${{ runner.temp }}/SnapFlow-release
+          ZIP_PATH: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ env.RELEASE_TAG }}.zip
         run: |
           set -euo pipefail
           APP_PATH="$ARCHIVE_PATH/Products/Applications/SnapFlow.app"
@@ -64,5 +67,5 @@ jobs:
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: SnapFlow ${{ env.RELEASE_TAG }}
-          files: ${{ env.ZIP_PATH }}
+          files: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ env.RELEASE_TAG }}.zip
           generate_release_notes: true
