@@ -13,17 +13,19 @@ extension SnapFlowKit.Name {
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
-	private var window: NSWindow!
 	private var statusItem: NSStatusItem!
+	private var statusMenu: NSMenu!
+	private var shortcutsPopover: NSPopover!
 	private var searchWindowController: SearchWindowController?
 	private var doubleCommandHotKey: DoubleCommandHotKey?
 	private let clipboardHistoryManager = ClipboardHistoryManager(maxItems: 50)
+	private let shortcutActionsModel = ShortcutActionsModel()
 	private var clipboardHistoryWindowController: ClipboardHistoryWindowController?
 	private var pasteFlowWindowController: PasteFlowWindowController?
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		setupStatusBar()
-		setupMainWindow()
+		setupShortcutsPopover()
 		createMenus()
 		requestKeyboardMonitoringPermissionsIfNeeded()
 		setupDoubleCommandDetection()
@@ -43,51 +45,53 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
 
 		if let button = statusItem.button {
-			if #available(macOS 11.0, *) {
+			if let image = NSImage(named: NSImage.Name("MenuBarIcon")) {
+				image.size = NSSize(width: 18, height: 18)
+				image.isTemplate = false
+				button.image = image
+				button.imagePosition = .imageOnly
+			} else if #available(macOS 11.0, *) {
 				button.image = NSImage(systemSymbolName: "command", accessibilityDescription: "SnapFlowKit")
 			} else {
 				button.title = "⌘"
 			}
+			button.target = self
+			button.action = #selector(toggleShortcutsPopover)
+			button.sendAction(on: [.leftMouseUp, .rightMouseUp])
 		}
 
 		let menu = NSMenu()
-		menu.addItem(NSMenuItem(title: "Show Window", action: #selector(showWindow), keyEquivalent: ""))
-		menu.addItem(NSMenuItem.separator())
 		menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
-
-		statusItem.menu = menu
+		statusMenu = menu
 	}
 
-	@objc private func showWindow() {
-		window.makeKeyAndOrderFront(nil)
-		NSApp.activate(ignoringOtherApps: true)
+	private func setupShortcutsPopover() {
+		let popover = NSPopover()
+		popover.behavior = .transient
+		popover.animates = true
+		popover.contentSize = NSSize(width: 560, height: 420)
+		popover.contentViewController = NSHostingController(rootView: ContentView(model: shortcutActionsModel))
+		shortcutsPopover = popover
+	}
+
+	@objc private func toggleShortcutsPopover() {
+		guard let button = statusItem.button else { return }
+		if NSApp.currentEvent?.type == .rightMouseUp {
+			statusMenu.popUp(positioning: nil, at: NSPoint(x: 0, y: button.bounds.height), in: button)
+			return
+		}
+
+		if shortcutsPopover.isShown {
+			shortcutsPopover.performClose(nil)
+		} else {
+			NSApp.activate(ignoringOtherApps: true)
+			shortcutsPopover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+			shortcutsPopover.contentViewController?.view.window?.makeKey()
+		}
 	}
 
 	@objc private func quitApp() {
 		NSApp.terminate(nil)
-	}
-
-	private func setupMainWindow() {
-		let contentView = ContentView()
-
-		window = NSWindow(
-			contentRect: CGRect(x: 0, y: 0, width: 720, height: 520),
-			styleMask: [
-				.titled,
-				.closable,
-				.miniaturizable,
-				.fullSizeContentView,
-				.resizable
-			],
-			backing: .buffered,
-			defer: false
-		)
-
-		window.title = "SnapFlowKit"
-		window.center()
-		window.setFrameAutosaveName("Main Window")
-		window.contentView = NSHostingView(rootView: contentView)
-		window.makeKeyAndOrderFront(nil)
 	}
 
 	func createMenus() {
