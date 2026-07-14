@@ -4,7 +4,7 @@
 
 ## 中文
 
-这是一个 macOS 桌面软件 **SnapFlow**,一个正在成长的快捷键效率工具。
+这是一个 macOS 桌面软件 **SnapFlow**,一个快捷键效率工具。
 
 <img src="screenshot.png" alt="SnapFlow screenshot" width="532">
 
