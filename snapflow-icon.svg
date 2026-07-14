@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+	<title id="title">SnapFlow icon</title>
+	<desc id="desc">A macOS-style app icon combining shortcut sparks, layered clipboard pages, and a flowing action arrow.</desc>
+	<defs>
+		<linearGradient id="bg" x1="158" y1="100" x2="872" y2="924" gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#1BE1D6"/>
+			<stop offset="0.42" stop-color="#0A9FB4"/>
+			<stop offset="1" stop-color="#263747"/>
+		</linearGradient>
+		<linearGradient id="sheetBack" x1="310" y1="200" x2="698" y2="790" gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#F7FBFF"/>
+			<stop offset="1" stop-color="#BFD2DE"/>
+		</linearGradient>
+		<linearGradient id="sheetFront" x1="360" y1="248" x2="692" y2="760" gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#FFFFFF"/>
+			<stop offset="1" stop-color="#DDEAF0"/>
+		</linearGradient>
+		<linearGradient id="flow" x1="268" y1="520" x2="806" y2="520" gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#FFE27A"/>
+			<stop offset="0.48" stop-color="#FFB33D"/>
+			<stop offset="1" stop-color="#FF7A45"/>
+		</linearGradient>
+		<linearGradient id="spark" x1="396" y1="212" x2="604" y2="476" gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#FFF8B8"/>
+			<stop offset="1" stop-color="#FFB02E"/>
+		</linearGradient>
+		<filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+			<feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="#102433" flood-opacity="0.34"/>
+		</filter>
+		<filter id="softShadow" x="-20%" y="-20%" width="140%" height="150%">
+			<feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#183241" flood-opacity="0.22"/>
+		</filter>
+		<clipPath id="roundIcon">
+			<rect x="72" y="72" width="880" height="880" rx="206"/>
+		</clipPath>
+	</defs>
+
+	<g clip-path="url(#roundIcon)">
+		<rect x="72" y="72" width="880" height="880" rx="206" fill="url(#bg)"/>
+		<circle cx="218" cy="182" r="210" fill="#FFFFFF" opacity="0.16"/>
+		<circle cx="840" cy="840" r="330" fill="#061723" opacity="0.22"/>
+		<path d="M112 756C258 700 340 726 446 780C548 832 690 846 912 724V952H112Z" fill="#081A25" opacity="0.18"/>
+
+		<g filter="url(#shadow)">
+			<rect x="274" y="236" width="382" height="520" rx="70" transform="rotate(-8 465 496)" fill="url(#sheetBack)" opacity="0.9"/>
+			<rect x="346" y="214" width="400" height="546" rx="78" transform="rotate(6 546 487)" fill="url(#sheetFront)"/>
+			<rect x="433" y="202" width="214" height="86" rx="38" transform="rotate(6 540 245)" fill="#263747"/>
+			<rect x="476" y="221" width="124" height="30" rx="15" transform="rotate(6 538 236)" fill="#9FEFE8"/>
+		</g>
+
+		<g opacity="0.72">
+			<rect x="424" y="374" width="218" height="30" rx="15" transform="rotate(6 533 389)" fill="#688596"/>
+			<rect x="407" y="452" width="282" height="30" rx="15" transform="rotate(6 548 467)" fill="#8AA4B1"/>
+			<rect x="391" y="529" width="210" height="30" rx="15" transform="rotate(6 496 544)" fill="#8AA4B1"/>
+		</g>
+
+		<path d="M275 591C358 479 474 468 578 519C637 547 676 535 704 494L668 490C648 487 640 462 655 448L753 356C767 343 790 352 792 371L807 505C809 526 786 540 769 529L735 507C690 581 617 607 535 568C454 531 388 554 334 626C319 646 288 642 278 619C274 610 273 599 275 591Z" fill="url(#flow)" filter="url(#softShadow)"/>
+
+		<path d="M497 286L435 419H505L462 555L600 383H526L570 286Z" fill="url(#spark)" filter="url(#softShadow)"/>
+		<path d="M497 286L435 419H505L462 555" fill="none" stroke="#FFFFFF" stroke-opacity="0.62" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/>
+
+		<g fill="#FFFFFF" opacity="0.9">
+			<circle cx="264" cy="360" r="16"/>
+			<circle cx="760" cy="648" r="13"/>
+			<circle cx="708" cy="260" r="10"/>
+		</g>
+	</g>
+</svg>
