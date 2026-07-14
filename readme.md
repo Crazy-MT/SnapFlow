@@ -2,8 +2,6 @@
 
 [English](#english) | [中文](#中文)
 
-<img src="logo.png" alt="SnapFlow" width="900">
-
 ## 中文
 
 这是一个 macOS 桌面软件 **SnapFlow**,一个正在成长的快捷键效率工具。
