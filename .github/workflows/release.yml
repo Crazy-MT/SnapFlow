@@ -1,0 +1,68 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to build, for example v0.1.0'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build and publish macOS app
+    runs-on: macos-latest
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      ARCHIVE_PATH: ${{ runner.temp }}/SnapFlow.xcarchive
+      EXPORT_PATH: ${{ runner.temp }}/SnapFlow-release
+      ZIP_PATH: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}.zip
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build archive
+        run: |
+          set -euo pipefail
+          xcodebuild archive \
+            -project SnapFlow.xcodeproj \
+            -scheme SnapFlowExample \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            -archivePath "$ARCHIVE_PATH" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_ALLOWED=YES \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
+            SKIP_INSTALL=NO
+
+      - name: Package app
+        run: |
+          set -euo pipefail
+          APP_PATH="$ARCHIVE_PATH/Products/Applications/SnapFlow.app"
+
+          test -d "$APP_PATH"
+          mkdir -p "$EXPORT_PATH"
+          ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: SnapFlow ${{ env.RELEASE_TAG }}
+          files: ${{ env.ZIP_PATH }}
+          generate_release_notes: true
