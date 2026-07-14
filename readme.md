@@ -81,6 +81,8 @@ PasteFlow 参考 [PurePaste](https://github.com/xiaoyunchengzhu/PurePaste)，接
 
 ## 运行
 
+如果下载 GitHub Releases 自动构建的压缩包，首次打开 `SnapFlow.app` 时 macOS 可能会提示“无法打开，因为 Apple 无法检查其是否包含恶意软件”或安全性被阻止。请到「系统设置」→「隐私与安全性」，在安全提示处点击「仍要打开」，之后即可正常启动。
+
 用 Xcode 打开：
 
 ```sh
@@ -234,6 +236,8 @@ Recognized types (matched most-specific first, returning the first hit): URL, JS
 - Some SwiftUI views require macOS 10.15+
 
 ## Run
+
+If you download the auto-built package from GitHub Releases, macOS may block `SnapFlow.app` the first time because it is not notarized. Open System Settings → Privacy & Security, find the security warning, and click **Open Anyway**. After that, the app can launch normally.
 
 ```sh
 open SnapFlow.xcodeproj
