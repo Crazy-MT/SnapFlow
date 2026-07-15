@@ -13,7 +13,6 @@ enum PasteFlowType: Equatable {
 	case json(pretty: String)
 	case math(expression: String, result: Double)
 	case tracking(String)
-	case richHTML(String)
 }
 
 /// 具名结构承载颜色，避免元组的 Equatable 麻烦。
@@ -257,10 +256,14 @@ enum PasteFlowDetector {
 
 	private static func detectAddress(_ text: String) -> Bool {
 		guard text.count >= 6, text.count <= 120 else { return false }
-		let keywords = ["路", "街", "号", "室", "区", "省", "市", "县", "巷",
-						"Street", "St.", "Avenue", "Ave", "Road", "Rd", "Blvd", "Lane"]
+		let chineseKeywords = ["路", "街", "号", "室", "区", "省", "市", "县", "巷"]
+		if chineseKeywords.contains(where: { text.contains($0) }) {
+			return true
+		}
+
+		let englishPattern = "\\b(street|st\\.?|avenue|ave\\.?|road|rd\\.?|blvd\\.?|lane)\\b"
 		let lowered = text.lowercased()
-		return keywords.contains { lowered.contains($0.lowercased()) }
+		return matches(lowered, pattern: englishPattern, caseInsensitive: true)
 	}
 
 	// MARK: - Helpers

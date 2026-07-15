@@ -153,8 +153,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 
 	private func setupClipboardHistory() {
-		clipboardHistoryManager.onNewClipboardText = { [weak self] text, isRich in
-			self?.showPasteFlowPanel(for: text, isRich: isRich)
+		clipboardHistoryManager.onNewClipboardText = { [weak self] text in
+			self?.showPasteFlowPanel(for: text)
 		}
 		clipboardHistoryManager.start()
 		SnapFlowKit.onKeyDown(for: .clipboardHistory) { [weak self] in
@@ -162,20 +162,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		}
 	}
 
-	private func showPasteFlowPanel(for text: String, isRich: Bool) {
-		// 先尝试识别具体意图（URL/颜色/数学等）。许多 App 复制纯文字时也会
-		// 顺带写入 HTML/RTF，所以只有在识别不出具体类型、且确实带富文本时，
-		// 才把它当作 richHTML 处理。
-		let type: PasteFlowType?
-		if let detected = PasteFlowDetector.detect(text) {
-			type = detected
-		} else if isRich {
-			type = .richHTML(text)
-		} else {
-			type = nil
-		}
-
-		guard let type else { return }
+	private func showPasteFlowPanel(for text: String) {
+		guard let type = PasteFlowDetector.detect(text) else { return }
 
 		pasteFlowWindowController?.closeWindow()
 
@@ -684,9 +672,9 @@ final class ClipboardHistoryManager {
 	private var lastChangeCount: Int
 	private var timer: Timer?
 
-	/// 轮询发现新复制的文本时回调。Bool 表示剪贴板是否含富文本（HTML/RTF）。
+	/// 轮询发现新复制的文本时回调。
 	/// 仅在轮询路径触发，不在 `setClipboardItem`（用户主动回写历史）时触发。
-	var onNewClipboardText: ((String, Bool) -> Void)?
+	var onNewClipboardText: ((String) -> Void)?
 	
 	init(maxItems: Int) {
 		self.maxItems = maxItems
@@ -735,8 +723,7 @@ final class ClipboardHistoryManager {
 		)
 
 		if case let .text(text) = item.content {
-			let isRich = pasteboard.data(forType: .html) != nil || pasteboard.data(forType: .rtf) != nil
-			onNewClipboardText?(text, isRich)
+			onNewClipboardText?(text)
 		}
 	}
 

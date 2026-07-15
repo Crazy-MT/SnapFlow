@@ -1,6 +1,25 @@
 import XCTest
 
 final class PasteFlowDetectorTests: XCTestCase {
+	func testPasteFlowTypeDoesNotIncludeRichText() {
+		let type = PasteFlowType.email("user@example.com")
+
+		switch type {
+		case .url,
+				.email,
+				.phone,
+				.address,
+				.ipAddress,
+				.color,
+				.dateTime,
+				.timestamp,
+				.json,
+				.math,
+				.tracking:
+			break
+		}
+	}
+
 	func testDetectsURL() {
 		guard case let .url(url)? = PasteFlowDetector.detect("https://example.com/path") else {
 			return XCTFail("应识别为 URL")
@@ -108,6 +127,11 @@ final class PasteFlowDetectorTests: XCTestCase {
 		} else {
 			XCTFail("应识别为地址")
 		}
+	}
+
+	func testCodeIdentifiersAreNotAddresses() {
+		XCTAssertNil(PasteFlowDetector.detect("keywordTypeDao"))
+		XCTAssertNil(PasteFlowDetector.detect("findKeywordTypeByName"))
 	}
 
 	func testPlainSentenceReturnsNil() {

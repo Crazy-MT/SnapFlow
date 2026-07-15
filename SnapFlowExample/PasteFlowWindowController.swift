@@ -313,7 +313,6 @@ private extension PasteFlowWindowController {
 		case .json: return "curlybraces"
 		case .math: return "function"
 		case .tracking: return "shippingbox"
-		case .richHTML: return "doc.richtext"
 		}
 	}
 
@@ -330,7 +329,6 @@ private extension PasteFlowWindowController {
 		case let .json(pretty): return pretty
 		case let .math(expression, result): return "\(expression) = \(formatNumber(result))"
 		case let .tracking(value): return value
-		case .richHTML: return "富文本内容"
 		}
 	}
 
@@ -397,16 +395,6 @@ private extension PasteFlowWindowController {
 					NSWorkspace.shared.open(url)
 				}
 			}]
-
-		case let .richHTML(html):
-			return [
-				PasteFlowActionButton(title: "转纯文本") {
-					copyToPasteboard(stripHTML(html))
-				},
-				PasteFlowActionButton(title: "转 Markdown") {
-					copyToPasteboard(stripHTML(html)) // 简化：先落纯文本，Markdown 转换后续可增强
-				}
-			]
 		}
 	}
 
@@ -423,17 +411,6 @@ private extension PasteFlowWindowController {
 		}
 	}
 
-	static func stripHTML(_ html: String) -> String {
-		guard let data = html.data(using: .utf8) else { return html }
-		let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
-			.documentType: NSAttributedString.DocumentType.html,
-			.characterEncoding: String.Encoding.utf8.rawValue
-		]
-		guard let attributed = try? NSAttributedString(data: data, options: options, documentAttributes: nil) else {
-			return html
-		}
-		return attributed.string
-	}
 }
 
 /// 非激活面板：能成为 key window 接收回车/Esc，但不会把整个 App 激活到前台。
