@@ -70,7 +70,7 @@ PasteFlow 参考 [PurePaste](https://github.com/xiaoyunchengzhu/PurePaste)，接
 | 电话 | 清洗后为 7-15 位数字的号码 |
 | 快递单号 | 覆盖顺丰、圆通、UPS、FedEx 等有限模式，并非穷尽 |
 
-检测逻辑（`PasteFlowDetector`）不依赖 AppKit，作为纯逻辑抽离并配有单元测试；面板 UI 与动作执行在 `PasteFlowWindowController` 中。检测顺序有意做了消歧：日期时间排在电话/数学式之前，时间戳排在电话/快递单号之前，避免纯数字或含 `-` 的串被误判。地址识别是兜底启发式，英文路名缩写只按独立单词匹配，避免把 `keywordTypeDao`、`findKeywordTypeByName` 这类代码标识符误判成地图地址。
+检测逻辑（`PasteFlowDetector`）不依赖 AppKit，作为纯逻辑抽离并配有单元测试；面板 UI 与动作执行在 `PasteFlowWindowController` 中。检测顺序有意做了消歧：日期时间排在电话/数学式之前，时间戳排在电话/快递单号之前，避免纯数字或含 `-` 的串被误判。地址识别是兜底启发式，英文路名缩写只按独立单词匹配。
 
 ## 系统要求
 
@@ -224,7 +224,7 @@ See [PasteFlow Smart Panel](#pasteflow-smart-panel) below for the full list of r
 
 Inspired by [PurePaste](https://github.com/xiaoyunchengzhu/PurePaste), PasteFlow hooks into the existing clipboard polling. Whenever new copied content is detected, `PasteFlowDetector` classifies it; on a hit, a `.nonactivatingPanel` floating window appears near the cursor without bringing the main window forward. The panel shows a summary plus a primary action button — `⏎` executes, `Esc` closes, clicking elsewhere dismisses it.
 
-Recognized types (matched most-specific first, returning the first hit): URL, JSON (shown pretty-printed), email, IPv4 address, color (`#RGB` / `#RRGGBB` / `rgb(...)`, with a color swatch), date/time, Unix timestamp (10-digit seconds / 13-digit milliseconds, formatted to `yyyy-MM-dd HH:mm:ss`), math expression (evaluated by a hand-written recursive-descent parser), phone number, shipping tracking number (a limited set of patterns), and address. The detection order is intentionally disambiguated so plain numbers or `-`-containing strings are not misclassified as phone/math/timestamp. Address detection is a last-resort heuristic; English street abbreviations are matched as standalone words so code identifiers such as `keywordTypeDao` and `findKeywordTypeByName` are not treated as map addresses.
+Recognized types (matched most-specific first, returning the first hit): URL, JSON (shown pretty-printed), email, IPv4 address, color (`#RGB` / `#RRGGBB` / `rgb(...)`, with a color swatch), date/time, Unix timestamp (10-digit seconds / 13-digit milliseconds, formatted to `yyyy-MM-dd HH:mm:ss`), math expression (evaluated by a hand-written recursive-descent parser), phone number, shipping tracking number (a limited set of patterns), and address. The detection order is intentionally disambiguated so plain numbers or `-`-containing strings are not misclassified as phone/math/timestamp. Address detection is a last-resort heuristic; English street abbreviations are matched as standalone words.
 
 `PasteFlowDetector` is pure logic (no AppKit) and unit-tested; the panel UI and action execution live in `PasteFlowWindowController`.
 
