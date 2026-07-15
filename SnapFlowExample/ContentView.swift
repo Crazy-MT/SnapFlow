@@ -185,6 +185,11 @@ struct ContentView: View {
 					}
 					.padding(4)
 				}
+
+				Text(AppVersionLabel.text())
+					.font(.caption)
+					.foregroundColor(.secondary)
+					.frame(maxWidth: .infinity, alignment: .center)
 			}
 			.padding()
 			.frame(maxWidth: .infinity, alignment: .leading)
