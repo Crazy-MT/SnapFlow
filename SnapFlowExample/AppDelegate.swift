@@ -20,8 +20,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	private var doubleCommandHotKey: DoubleCommandHotKey?
 	private let clipboardHistoryManager = ClipboardHistoryManager(maxItems: 50)
 	private let shortcutActionsModel = ShortcutActionsModel()
+	private let updater = GitHubReleaseUpdater()
 	private var clipboardHistoryWindowController: ClipboardHistoryWindowController?
 	private var pasteFlowWindowController: PasteFlowWindowController?
+	private var isCheckingForUpdates = false
+	private var isDownloadingUpdate = false
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		setupStatusBar()
@@ -30,6 +33,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		requestKeyboardMonitoringPermissionsIfNeeded()
 		setupDoubleCommandDetection()
 		setupClipboardHistory()
+		checkForUpdatesAutomatically()
 	}
 	
 	private func requestKeyboardMonitoringPermissionsIfNeeded() {
@@ -61,6 +65,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		}
 
 		let menu = NSMenu()
+		menu.addItem(NSMenuItem(title: "检查更新...", action: #selector(checkForUpdatesFromMenu), keyEquivalent: ""))
+		let versionItem = NSMenuItem(title: AppVersionLabel.text(), action: nil, keyEquivalent: "")
+		versionItem.isEnabled = false
+		menu.addItem(versionItem)
+		menu.addItem(NSMenuItem.separator())
 		menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
 		statusMenu = menu
 	}
@@ -92,6 +101,87 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 	@objc private func quitApp() {
 		NSApp.terminate(nil)
+	}
+
+	@objc private func checkForUpdatesFromMenu() {
+		checkForUpdates(isAutomatic: false)
+	}
+
+	private func checkForUpdatesAutomatically() {
+		DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
+			self?.checkForUpdates(isAutomatic: true)
+		}
+	}
+
+	private func checkForUpdates(isAutomatic: Bool) {
+		guard !isCheckingForUpdates else {
+			if !isAutomatic {
+				showAlert(title: "正在检查更新", message: "SnapFlow 正在检查最新版本。")
+			}
+			return
+		}
+
+		isCheckingForUpdates = true
+		updater.checkForUpdate { [weak self] result in
+			guard let self = self else { return }
+			self.isCheckingForUpdates = false
+
+			switch result {
+			case .success(.upToDate):
+				if !isAutomatic {
+					self.showAlert(title: "已是最新版本", message: "当前 SnapFlow 已经是最新版本。")
+				}
+			case .success(.updateAvailable(let release, let asset)):
+				self.showUpdateAvailableAlert(release: release, asset: asset)
+			case .failure(let error):
+				if !isAutomatic {
+					self.showAlert(title: "检查更新失败", message: error.localizedDescription)
+				}
+			}
+		}
+	}
+
+	private func showUpdateAvailableAlert(release: GitHubRelease, asset: GitHubReleaseAsset) {
+		let alert = NSAlert()
+		alert.messageText = "发现新版本 \(release.tagName)"
+		alert.informativeText = "是否下载并启动安装？"
+		alert.alertStyle = .informational
+		alert.addButton(withTitle: "下载并安装")
+		alert.addButton(withTitle: "稍后")
+
+		guard alert.runModal() == .alertFirstButtonReturn else {
+			return
+		}
+
+		downloadAndOpenUpdate(asset)
+	}
+
+	private func downloadAndOpenUpdate(_ asset: GitHubReleaseAsset) {
+		guard !isDownloadingUpdate else {
+			showAlert(title: "正在下载更新", message: "SnapFlow 正在下载更新安装包。")
+			return
+		}
+
+		isDownloadingUpdate = true
+		updater.downloadAndOpenInstaller(for: asset) { [weak self] result in
+			guard let self = self else { return }
+			self.isDownloadingUpdate = false
+
+			switch result {
+			case .success(let url):
+				self.showAlert(title: "下载完成", message: "已下载到 \(url.path)，并已启动安装流程。")
+			case .failure(let error):
+				self.showAlert(title: "更新下载失败", message: error.localizedDescription)
+			}
+		}
+	}
+
+	private func showAlert(title: String, message: String) {
+		let alert = NSAlert()
+		alert.messageText = title
+		alert.informativeText = message
+		alert.alertStyle = .informational
+		alert.runModal()
 	}
 
 	func createMenus() {

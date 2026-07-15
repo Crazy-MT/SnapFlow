@@ -20,6 +20,9 @@
 		E7A000122A00000000000001 /* PasteFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000102A00000000000001 /* PasteFlowDetector.swift */; };
 		E7A000142A00000000000001 /* PasteFlowWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000132A00000000000001 /* PasteFlowWindowController.swift */; };
 		E7A000162A00000000000001 /* PasteFlowDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */; };
+		E7A000182A00000000000001 /* GitHubReleaseUpdaterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */; };
+		E7A0001A2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */; };
+		E7A0001B2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */; };
 		E38103FE246449180023E9A8 /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38103FD246449180023E9A8 /* Name.swift */; };
 		E3AD497024705C7600F51C0D /* NSMenuItem++.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3AD496F24705C7600F51C0D /* NSMenuItem++.swift */; };
 		E3BF5627245C23840024D9BF /* Recorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3BF5626245C23840024D9BF /* Recorder.swift */; };
@@ -81,6 +84,8 @@
 		E7A000102A00000000000001 /* PasteFlowDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetector.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000132A00000000000001 /* PasteFlowWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetectorTests.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdaterTests.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdater.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E38103FD246449180023E9A8 /* Name.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Name.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3AD496F24705C7600F51C0D /* NSMenuItem++.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = "NSMenuItem++.swift"; sourceTree = "<group>"; usesTabs = 1; };
 		E3BF5626245C23840024D9BF /* Recorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Recorder.swift; sourceTree = "<group>"; usesTabs = 1; };
@@ -136,6 +141,7 @@
 				E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */,
 				E7A000002A00000000000001 /* SearchEngineTests.swift */,
 				E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */,
+				E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */,
 				E3500C3E24DEDDEC00F4B055 /* Utilities.swift */,
 				E3500C3724DEDCEF00F4B055 /* Info.plist */,
 			);
@@ -148,6 +154,7 @@
 				E3BF5634245C2BB30024D9BF /* AppDelegate.swift */,
 				E7A000082A00000000000001 /* ClipboardHistorySelection.swift */,
 				E3BF5636245C2BB30024D9BF /* ContentView.swift */,
+				E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */,
 				E7A000022A00000000000001 /* SearchEngine.swift */,
 				E7A000102A00000000000001 /* PasteFlowDetector.swift */,
 				E7A000132A00000000000001 /* PasteFlowWindowController.swift */,
@@ -396,6 +403,8 @@
 				E7A000012A00000000000001 /* SearchEngineTests.swift in Sources */,
 				E7A000122A00000000000001 /* PasteFlowDetector.swift in Sources */,
 				E7A000162A00000000000001 /* PasteFlowDetectorTests.swift in Sources */,
+				E7A000182A00000000000001 /* GitHubReleaseUpdaterTests.swift in Sources */,
+				E7A0001B2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,6 +418,7 @@
 				E7A000032A00000000000001 /* SearchEngine.swift in Sources */,
 				E7A000112A00000000000001 /* PasteFlowDetector.swift in Sources */,
 				E7A000142A00000000000001 /* PasteFlowWindowController.swift in Sources */,
+				E7A0001A2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -604,7 +614,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 0.2.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creazymt.snapflow;
@@ -674,7 +684,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 0.2.1;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creazymt.snapflow;
