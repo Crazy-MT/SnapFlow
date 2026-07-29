@@ -1,6 +1,8 @@
 import Cocoa
 import ApplicationServices
+import Carbon.HIToolbox
 import CoreGraphics
+import Darwin
 import SwiftUI
 import SnapFlowKit
 
@@ -11,7 +13,7 @@ extension SnapFlowKit.Name {
 	)
 	static let hyperSwitch = Self(
 		"hyperSwitch",
-		default: .init(.tab, modifiers: [.option])
+		default: .init(.tab, modifiers: [.command])
 	)
 }
 
@@ -23,6 +25,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	private var searchWindowController: SearchWindowController?
 	private var permissionGuideWindowController: PermissionGuideWindowController?
 	private var doubleCommandHotKey: DoubleCommandHotKey?
+	private var commandTabHotKey: CommandTabHotKey?
+	private var networkSpeedMonitor: NetworkSpeedMonitor?
+	private var networkSpeedLabel: NSTextField?
 	private let clipboardHistoryManager = ClipboardHistoryManager(maxItems: 50)
 	private let shortcutActionsModel = ShortcutActionsModel()
 	private let updater = GitHubReleaseUpdater()
@@ -40,6 +45,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		setupDoubleCommandDetection()
 		setupClipboardHistory()
 		setupHyperSwitch()
+		setupCommandTabDetection()
 		checkForUpdatesAutomatically()
 	}
 	
@@ -54,23 +60,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 
 	private func setupStatusBar() {
-		statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
+		statusItem = NSStatusBar.system.statusItem(withLength: 58)
 
 		if let button = statusItem.button {
-			if let image = NSImage(named: NSImage.Name("MenuBarIcon")) {
-				image.size = NSSize(width: 18, height: 18)
-				image.isTemplate = false
-				button.image = image
-				button.imagePosition = .imageOnly
-			} else if #available(macOS 11.0, *) {
-				button.image = NSImage(systemSymbolName: "command", accessibilityDescription: "SnapFlowKit")
-			} else {
-				button.title = "⌘"
-			}
+			configureStatusBarButton(button)
 			button.target = self
 			button.action = #selector(toggleShortcutsPopover)
 			button.sendAction(on: [.leftMouseUp, .rightMouseUp])
 		}
+		startNetworkSpeedMonitor()
 
 		let menu = NSMenu()
 		menu.addItem(NSMenuItem(title: "权限引导...", action: #selector(showPermissionGuideFromMenu), keyEquivalent: ""))
@@ -81,6 +79,45 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		menu.addItem(NSMenuItem.separator())
 		menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
 		statusMenu = menu
+	}
+
+	private func configureStatusBarButton(_ button: NSStatusBarButton) {
+		button.image = nil
+		button.title = ""
+		button.attributedTitle = NSAttributedString(string: "")
+
+		let iconView = NSImageView()
+		iconView.translatesAutoresizingMaskIntoConstraints = false
+		iconView.imageScaling = .scaleProportionallyDown
+		if let image = NSImage(named: NSImage.Name("MenuBarIcon")) {
+			image.size = NSSize(width: 18, height: 18)
+			image.isTemplate = false
+			iconView.image = image
+		} else if #available(macOS 11.0, *) {
+			iconView.image = NSImage(systemSymbolName: "command", accessibilityDescription: "SnapFlowKit")
+		}
+
+		let label = NSTextField(labelWithString: NetworkSpeedMonitor.format(.init(uploadBytesPerSecond: 0, downloadBytesPerSecond: 0)))
+		label.translatesAutoresizingMaskIntoConstraints = false
+		label.alignment = .center
+		label.font = NSFont.monospacedDigitSystemFont(ofSize: 8.5, weight: .regular)
+		label.textColor = .labelColor
+		label.maximumNumberOfLines = 2
+		networkSpeedLabel = label
+
+		button.addSubview(iconView)
+		button.addSubview(label)
+		NSLayoutConstraint.activate([
+			iconView.leadingAnchor.constraint(equalTo: button.leadingAnchor, constant: 4),
+			iconView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+			iconView.widthAnchor.constraint(equalToConstant: 18),
+			iconView.heightAnchor.constraint(equalToConstant: 18),
+
+			label.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 2),
+			label.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -4),
+			label.centerYAnchor.constraint(equalTo: button.centerYAnchor),
+			label.heightAnchor.constraint(equalToConstant: 20)
+		])
 	}
 
 	private func setupShortcutsPopover() {
@@ -279,9 +316,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 
 	private func setupHyperSwitch() {
+		let migrationKey = "didMigrateHyperSwitchShortcutToCommandTab"
+		if !UserDefaults.standard.bool(forKey: migrationKey) {
+			SnapFlowKit.setShortcut(.init(.tab, modifiers: [.command]), for: .hyperSwitch)
+			UserDefaults.standard.set(true, forKey: migrationKey)
+		}
+
 		SnapFlowKit.onKeyDown(for: .hyperSwitch) { [weak self] in
 			self?.handleHyperSwitchHotKey()
 		}
+	}
+
+	private func setupCommandTabDetection() {
+		commandTabHotKey = CommandTabHotKey(
+			shouldHandle: {
+				SnapFlowKit.getShortcut(for: .hyperSwitch) == SnapFlowKit.Shortcut(.tab, modifiers: [.command])
+			},
+			onTrigger: { [weak self] in
+				self?.handleHyperSwitchHotKey()
+			},
+			onCancel: { [weak self] in
+				guard let controller = self?.hyperSwitchWindowController, controller.isVisible else { return false }
+				controller.closeWindow()
+				return true
+			}
+		)
+		commandTabHotKey?.start()
 	}
 
 	private func handleHyperSwitchHotKey() {
@@ -381,6 +441,210 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 			if let url = SearchEngine.saved.searchURL(for: trimmedQuery) {
 				NSWorkspace.shared.open(url)
 			}
+		}
+	}
+
+	private func startNetworkSpeedMonitor() {
+		let monitor = NetworkSpeedMonitor { [weak self] speed in
+			self?.networkSpeedLabel?.stringValue = NetworkSpeedMonitor.format(speed)
+		}
+		networkSpeedMonitor = monitor
+		monitor.start()
+	}
+}
+
+struct NetworkSpeed: Equatable {
+	let uploadBytesPerSecond: UInt64
+	let downloadBytesPerSecond: UInt64
+}
+
+final class NetworkSpeedMonitor {
+	private struct Snapshot {
+		let uploadBytes: UInt64
+		let downloadBytes: UInt64
+		let time: TimeInterval
+	}
+
+	private let onUpdate: (NetworkSpeed) -> Void
+	private var previousSnapshot: Snapshot?
+	private var timer: Timer?
+
+	init(onUpdate: @escaping (NetworkSpeed) -> Void) {
+		self.onUpdate = onUpdate
+	}
+
+	deinit {
+		stop()
+	}
+
+	func start() {
+		stop()
+		previousSnapshot = Self.currentSnapshot()
+		onUpdate(NetworkSpeed(uploadBytesPerSecond: 0, downloadBytesPerSecond: 0))
+
+		let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
+			self?.poll()
+		}
+		timer.tolerance = 0.2
+		RunLoop.main.add(timer, forMode: .common)
+		self.timer = timer
+	}
+
+	func stop() {
+		timer?.invalidate()
+		timer = nil
+	}
+
+	static func format(_ speed: NetworkSpeed) -> String {
+		"↑\(speed.uploadBytesPerSecond / 1024)KB\n↓\(speed.downloadBytesPerSecond / 1024)KB"
+	}
+
+	private func poll() {
+		let snapshot = Self.currentSnapshot()
+		defer { previousSnapshot = snapshot }
+
+		guard let previousSnapshot else { return }
+		let elapsed = max(snapshot.time - previousSnapshot.time, 1)
+		onUpdate(
+			NetworkSpeed(
+				uploadBytesPerSecond: delta(snapshot.uploadBytes, previousSnapshot.uploadBytes) / UInt64(elapsed),
+				downloadBytesPerSecond: delta(snapshot.downloadBytes, previousSnapshot.downloadBytes) / UInt64(elapsed)
+			)
+		)
+	}
+
+	private func delta(_ current: UInt64, _ previous: UInt64) -> UInt64 {
+		current >= previous ? current - previous : 0
+	}
+
+	private static func currentSnapshot() -> Snapshot {
+		var interfaces: UnsafeMutablePointer<ifaddrs>?
+		var uploadBytes: UInt64 = 0
+		var downloadBytes: UInt64 = 0
+
+		guard getifaddrs(&interfaces) == 0 else {
+			return Snapshot(uploadBytes: 0, downloadBytes: 0, time: Date().timeIntervalSinceReferenceDate)
+		}
+		defer { freeifaddrs(interfaces) }
+
+		var pointer = interfaces
+		while let current = pointer {
+			defer { pointer = current.pointee.ifa_next }
+			guard
+				let address = current.pointee.ifa_addr,
+				Int32(address.pointee.sa_family) == AF_LINK,
+				(current.pointee.ifa_flags & UInt32(IFF_UP)) != 0,
+				(current.pointee.ifa_flags & UInt32(IFF_LOOPBACK)) == 0,
+				let data = current.pointee.ifa_data?.assumingMemoryBound(to: if_data.self).pointee
+			else {
+				continue
+			}
+
+			uploadBytes += UInt64(data.ifi_obytes)
+			downloadBytes += UInt64(data.ifi_ibytes)
+		}
+
+		return Snapshot(
+			uploadBytes: uploadBytes,
+			downloadBytes: downloadBytes,
+			time: Date().timeIntervalSinceReferenceDate
+		)
+	}
+}
+
+final class CommandTabHotKey {
+	private let shouldHandle: () -> Bool
+	private let onTrigger: () -> Void
+	private let onCancel: () -> Bool
+	private var eventTap: CFMachPort?
+	private var runLoopSource: CFRunLoopSource?
+
+	init(shouldHandle: @escaping () -> Bool, onTrigger: @escaping () -> Void, onCancel: @escaping () -> Bool) {
+		self.shouldHandle = shouldHandle
+		self.onTrigger = onTrigger
+		self.onCancel = onCancel
+	}
+
+	deinit {
+		stop()
+	}
+
+	func start() {
+		stop()
+		guard AXIsProcessTrusted() else { return }
+
+		let keyDownMask = CGEventMask(1 << CGEventType.keyDown.rawValue)
+		let callback: CGEventTapCallBack = { _, type, cgEvent, userInfo in
+			guard let userInfo else {
+				return Unmanaged.passUnretained(cgEvent)
+			}
+
+			if type == .tapDisabledByTimeout || type == .tapDisabledByUserInput {
+				let instance = Unmanaged<CommandTabHotKey>.fromOpaque(userInfo).takeUnretainedValue()
+				if let eventTap = instance.eventTap {
+					CGEvent.tapEnable(tap: eventTap, enable: true)
+				}
+				return Unmanaged.passUnretained(cgEvent)
+			}
+
+			guard type == .keyDown else {
+				return Unmanaged.passUnretained(cgEvent)
+			}
+
+			let instance = Unmanaged<CommandTabHotKey>.fromOpaque(userInfo).takeUnretainedValue()
+			let flags = NSEvent.ModifierFlags(rawValue: UInt(cgEvent.flags.rawValue)).intersection(.deviceIndependentFlagsMask)
+			let keyCode = cgEvent.getIntegerValueField(.keyboardEventKeycode)
+			guard
+				instance.shouldHandle(),
+				flags.contains(.command)
+			else {
+				return Unmanaged.passUnretained(cgEvent)
+			}
+
+			if keyCode == CGKeyCode(kVK_Escape), instance.onCancel() {
+				return nil
+			}
+
+			guard keyCode == CGKeyCode(kVK_Tab) else {
+				return Unmanaged.passUnretained(cgEvent)
+			}
+
+			DispatchQueue.main.async { [onTrigger = instance.onTrigger] in
+				onTrigger()
+			}
+			return nil
+		}
+
+		guard let eventTap = CGEvent.tapCreate(
+			tap: .cgSessionEventTap,
+			place: .headInsertEventTap,
+			options: .defaultTap,
+			eventsOfInterest: keyDownMask,
+			callback: callback,
+			userInfo: UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+		) else {
+			return
+		}
+
+		self.eventTap = eventTap
+
+		let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
+		self.runLoopSource = runLoopSource
+
+		CFRunLoopAddSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
+		CGEvent.tapEnable(tap: eventTap, enable: true)
+	}
+
+	func stop() {
+		if let runLoopSource {
+			CFRunLoopRemoveSource(CFRunLoopGetMain(), runLoopSource, .commonModes)
+			self.runLoopSource = nil
+		}
+
+		if let eventTap {
+			CGEvent.tapEnable(tap: eventTap, enable: false)
+			CFMachPortInvalidate(eventTap)
+			self.eventTap = nil
 		}
 	}
 }

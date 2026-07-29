@@ -186,7 +186,6 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 
 	func activateAndFocus() {
 		guard let window, !isClosing else { return }
-		reloadWindows()
 		NSApp.activate(ignoringOtherApps: true)
 		window.makeKeyAndOrderFront(nil)
 	}
@@ -337,12 +336,12 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		}
 
 		localFlagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-			self?.commitIfOptionReleased(flags: event.modifierFlags)
+			self?.commitIfCommandReleased(flags: event.modifierFlags)
 			return event
 		}
 
 		globalFlagsMonitor = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
-			self?.commitIfOptionReleased(flags: event.modifierFlags)
+			self?.commitIfCommandReleased(flags: event.modifierFlags)
 		}
 
 	}
@@ -371,7 +370,7 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		if !windows.isEmpty, !hasSnapshots, !HyperSwitchWindowProvider.hasScreenCaptureAccess() {
 			hintLabel?.stringValue = "请在系统设置 > 隐私与安全性 > 屏幕录制中允许 SnapFlow"
 		} else {
-			hintLabel?.stringValue = "按住 Option，Tab 选择，松开切换    Esc 关闭"
+			hintLabel?.stringValue = "按住 Command，Tab 选择，松开切换    Esc 关闭"
 		}
 	}
 
@@ -452,9 +451,9 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		}
 	}
 
-	private func commitIfOptionReleased(flags: NSEvent.ModifierFlags) {
+	private func commitIfCommandReleased(flags: NSEvent.ModifierFlags) {
 		let deviceFlags = flags.intersection(.deviceIndependentFlagsMask)
-		guard !deviceFlags.contains(.option) else { return }
+		guard !deviceFlags.contains(.command) else { return }
 		commitSelection()
 	}
 

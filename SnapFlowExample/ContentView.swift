@@ -137,7 +137,7 @@ struct ContentView: View {
 
 						UsageGuideRow(
 							title: "窗口切换",
-							detail: "按住 Option 后按 Tab 打开横向窗口列表，继续按 Tab 选择下一个窗口，松开 Option 切换到当前选中窗口。"
+							detail: "按住 Command 后按 Tab 打开横向窗口列表，继续按 Tab 选择下一个窗口，松开 Command 切换到当前选中窗口。"
 						)
 
 						UsageGuideRow(
