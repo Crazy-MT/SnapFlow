@@ -519,9 +519,16 @@ class SearchWindowController: NSWindowController, NSWindowDelegate {
 	private let onClose: () -> Void
 	private var searchField: NSSearchField?
 	private var searchEnginePopUpButton: NSPopUpButton?
+	private var applicationResultsStackView: NSStackView?
+	private var applicationResultButtons = [NSButton]()
+	private var applicationSearchResults = [ApplicationSearchResult]()
+	private var selectedApplicationIndex = 0
+	private lazy var installedApplications = ApplicationSearchResult.installedApplications()
 	private var keyDownMonitor: Any?
 	private var isClosing = false
 	private weak var backgroundView: NSVisualEffectView?
+	private let collapsedHeight: CGFloat = 86
+	private let expandedHeight: CGFloat = 308
 	
 	var isVisible: Bool {
 		guard let window else { return false }
@@ -631,6 +638,15 @@ class SearchWindowController: NSWindowController, NSWindowDelegate {
 		hintLabel.font = NSFont.systemFont(ofSize: 11, weight: .medium)
 		hintLabel.textColor = .secondaryLabelColor
 		contentView.addSubview(hintLabel)
+
+		let applicationResultsStackView = NSStackView()
+		applicationResultsStackView.translatesAutoresizingMaskIntoConstraints = false
+		applicationResultsStackView.orientation = .vertical
+		applicationResultsStackView.alignment = .leading
+		applicationResultsStackView.spacing = 4
+		applicationResultsStackView.isHidden = true
+		self.applicationResultsStackView = applicationResultsStackView
+		contentView.addSubview(applicationResultsStackView)
 		
 		window.contentView = rootView
 		NSLayoutConstraint.activate([
@@ -650,7 +666,10 @@ class SearchWindowController: NSWindowController, NSWindowDelegate {
 			
 			hintLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 32),
 			hintLabel.topAnchor.constraint(equalTo: row.bottomAnchor, constant: 6),
-			hintLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+			applicationResultsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 32),
+			applicationResultsStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+			applicationResultsStackView.topAnchor.constraint(equalTo: hintLabel.bottomAnchor, constant: 10),
+			applicationResultsStackView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor)
 		])
 		
 		if let cell = searchField.cell as? NSSearchFieldCell {
@@ -662,6 +681,19 @@ class SearchWindowController: NSWindowController, NSWindowDelegate {
 			if event.keyCode == 53 {
 				self?.closeWindow()
 				return nil
+			}
+			if event.keyCode == 125 {
+				self?.selectApplicationResult(offset: 1)
+				return (self?.resultCount ?? 0) > 0 ? nil : event
+			}
+			if event.keyCode == 126 {
+				self?.selectApplicationResult(offset: -1)
+				return (self?.resultCount ?? 0) > 0 ? nil : event
+			}
+			if event.keyCode == 36 || event.keyCode == 76 {
+				if self?.runSelectedResult() == true {
+					return nil
+				}
 			}
 			return event
 		}
@@ -681,6 +713,8 @@ class SearchWindowController: NSWindowController, NSWindowDelegate {
 	
 	func show() {
 		isClosing = false
+		installedApplications = ApplicationSearchResult.installedApplications()
+		updateApplicationResults(for: searchField?.stringValue ?? "")
 		window?.alphaValue = 0
 		window?.center()
 		window?.makeKeyAndOrderFront(nil)
@@ -727,6 +761,113 @@ class SearchWindowController: NSWindowController, NSWindowDelegate {
 	func windowDidResignKey(_ notification: Notification) {
 		closeWindow()
 	}
+
+	private func updateApplicationResults(for query: String) {
+		let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+		applicationSearchResults = ApplicationSearchResult.filtered(installedApplications, query: trimmedQuery)
+		selectedApplicationIndex = 0
+		applicationResultButtons.forEach { $0.removeFromSuperview() }
+		applicationResultButtons = applicationSearchResults.enumerated().map { index, result in
+			let button = makeResultButton(title: result.name, tag: index, action: #selector(openApplicationResult(_:)))
+			let icon = NSWorkspace.shared.icon(forFile: result.url.path)
+			icon.size = NSSize(width: 18, height: 18)
+			button.image = icon
+			applicationResultsStackView?.addArrangedSubview(button)
+			return button
+		}
+		if !trimmedQuery.isEmpty {
+			let button = makeResultButton(
+				title: "\(SearchEngine.saved.title) 搜索 \"\(trimmedQuery)\"",
+				tag: applicationSearchResults.count,
+				action: #selector(searchInBrowser)
+			)
+			if #available(macOS 11.0, *) {
+				button.image = NSImage(systemSymbolName: "magnifyingglass", accessibilityDescription: nil)
+			}
+			applicationResultsStackView?.addArrangedSubview(button)
+			applicationResultButtons.append(button)
+		}
+		applicationResultsStackView?.isHidden = resultCount == 0
+		updateApplicationSelection()
+		resizeWindow(expanded: resultCount > 0)
+	}
+
+	private func makeResultButton(title: String, tag: Int, action: Selector) -> NSButton {
+		let button = NSButton(title: title, target: self, action: action)
+		button.translatesAutoresizingMaskIntoConstraints = false
+		button.tag = tag
+		button.isBordered = false
+		button.alignment = .left
+		button.font = NSFont.systemFont(ofSize: 13, weight: .medium)
+		button.imagePosition = .imageLeading
+		button.wantsLayer = true
+		button.layer?.cornerRadius = 6
+		button.contentTintColor = .labelColor
+		NSLayoutConstraint.activate([
+			button.heightAnchor.constraint(equalToConstant: 28),
+			button.widthAnchor.constraint(equalToConstant: 690)
+		])
+		return button
+	}
+
+	private func selectApplicationResult(offset: Int) {
+		guard resultCount > 0 else { return }
+		selectedApplicationIndex = (selectedApplicationIndex + offset + resultCount) % resultCount
+		updateApplicationSelection()
+	}
+
+	private func updateApplicationSelection() {
+		for (index, button) in applicationResultButtons.enumerated() {
+			button.layer?.backgroundColor = index == selectedApplicationIndex
+				? NSColor.controlAccentColor.withAlphaComponent(0.22).cgColor
+				: NSColor.clear.cgColor
+		}
+	}
+
+	private var resultCount: Int {
+		applicationResultButtons.count
+	}
+
+	private func runSelectedResult() -> Bool {
+		if selectedApplicationIndex == applicationSearchResults.count {
+			searchCurrentTextInBrowser()
+			return true
+		}
+		guard applicationSearchResults.indices.contains(selectedApplicationIndex) else { return false }
+		let result = applicationSearchResults[selectedApplicationIndex]
+		closeWindow()
+		NSWorkspace.shared.openApplication(at: result.url, configuration: NSWorkspace.OpenConfiguration())
+		return true
+	}
+
+	@objc
+	private func openApplicationResult(_ sender: NSButton) {
+		selectedApplicationIndex = sender.tag
+		_ = runSelectedResult()
+	}
+
+	@objc
+	private func searchInBrowser() {
+		searchCurrentTextInBrowser()
+	}
+
+	private func searchCurrentTextInBrowser() {
+		guard let text = searchField?.stringValue.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty else {
+			return
+		}
+		onSearch(text)
+		closeWindow()
+	}
+
+	private func resizeWindow(expanded: Bool) {
+		guard let window else { return }
+		let targetHeight = expanded ? expandedHeight : collapsedHeight
+		guard abs(window.frame.height - targetHeight) > 0.5 else { return }
+		var frame = window.frame
+		frame.origin.y += frame.height - targetHeight
+		frame.size.height = targetHeight
+		window.setFrame(frame, display: true, animate: true)
+	}
 }
 
 extension SearchWindowController: NSSearchFieldDelegate {
@@ -736,14 +877,24 @@ extension SearchWindowController: NSSearchFieldDelegate {
 	
 	func controlTextDidEndEditing(_ obj: Notification) {
 		backgroundView?.layer?.borderColor = NSColor.separatorColor.withAlphaComponent(0.35).cgColor
+		if resultCount > 0 {
+			return
+		}
 		if let text = searchField?.stringValue.trimmingCharacters(in: .whitespacesAndNewlines), !text.isEmpty {
 			onSearch(text)
 			closeWindow()
 		}
 	}
+
+	func controlTextDidChange(_ obj: Notification) {
+		updateApplicationResults(for: searchField?.stringValue ?? "")
+	}
 	
 	func textField(_ textField: NSTextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
 		if string == "\r" {
+			if runSelectedResult() {
+				return false
+			}
 			let text = textField.stringValue.trimmingCharacters(in: .whitespacesAndNewlines)
 			if !text.isEmpty {
 				onSearch(text)
