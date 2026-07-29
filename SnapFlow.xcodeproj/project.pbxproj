@@ -19,6 +19,8 @@
 		E7A000112A00000000000001 /* PasteFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000102A00000000000001 /* PasteFlowDetector.swift */; };
 		E7A000122A00000000000001 /* PasteFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000102A00000000000001 /* PasteFlowDetector.swift */; };
 		E7A000142A00000000000001 /* PasteFlowWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000132A00000000000001 /* PasteFlowWindowController.swift */; };
+		E7A000202A00000000000001 /* HyperSwitchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000212A00000000000001 /* HyperSwitchWindowController.swift */; };
+		E7A000222A00000000000001 /* PermissionGuideWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000232A00000000000001 /* PermissionGuideWindowController.swift */; };
 		E7A000162A00000000000001 /* PasteFlowDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */; };
 		E7A000182A00000000000001 /* GitHubReleaseUpdaterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */; };
 		E7A0001A2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */; };
@@ -83,6 +85,8 @@
 		E7A000022A00000000000001 /* SearchEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SearchEngine.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000102A00000000000001 /* PasteFlowDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetector.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000132A00000000000001 /* PasteFlowWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000212A00000000000001 /* HyperSwitchWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = HyperSwitchWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000232A00000000000001 /* PermissionGuideWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PermissionGuideWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetectorTests.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdaterTests.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdater.swift; sourceTree = "<group>"; usesTabs = 1; };
@@ -158,6 +162,8 @@
 				E7A000022A00000000000001 /* SearchEngine.swift */,
 				E7A000102A00000000000001 /* PasteFlowDetector.swift */,
 				E7A000132A00000000000001 /* PasteFlowWindowController.swift */,
+				E7A000212A00000000000001 /* HyperSwitchWindowController.swift */,
+				E7A000232A00000000000001 /* PermissionGuideWindowController.swift */,
 				E3BF5638245C2BB50024D9BF /* Assets.xcassets */,
 				E3BF563D245C2BB50024D9BF /* Main.storyboard */,
 				E3BF5640245C2BB50024D9BF /* Info.plist */,
@@ -418,6 +424,8 @@
 				E7A000032A00000000000001 /* SearchEngine.swift in Sources */,
 				E7A000112A00000000000001 /* PasteFlowDetector.swift in Sources */,
 				E7A000142A00000000000001 /* PasteFlowWindowController.swift in Sources */,
+				E7A000202A00000000000001 /* HyperSwitchWindowController.swift in Sources */,
+				E7A000222A00000000000001 /* PermissionGuideWindowController.swift in Sources */,
 				E7A0001A2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -584,8 +592,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = SnapFlowExample/SnapFlowExample.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -658,8 +666,8 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = SnapFlowExample/SnapFlowExample.entitlements;
-				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = NO;

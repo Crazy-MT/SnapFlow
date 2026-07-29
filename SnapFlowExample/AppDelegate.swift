@@ -9,6 +9,10 @@ extension SnapFlowKit.Name {
 		"clipboardHistory",
 		default: .init(.v, modifiers: [.command, .shift])
 	)
+	static let hyperSwitch = Self(
+		"hyperSwitch",
+		default: .init(.tab, modifiers: [.option])
+	)
 }
 
 @NSApplicationMain
@@ -17,11 +21,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	private var statusMenu: NSMenu!
 	private var shortcutsPopover: NSPopover!
 	private var searchWindowController: SearchWindowController?
+	private var permissionGuideWindowController: PermissionGuideWindowController?
 	private var doubleCommandHotKey: DoubleCommandHotKey?
 	private let clipboardHistoryManager = ClipboardHistoryManager(maxItems: 50)
 	private let shortcutActionsModel = ShortcutActionsModel()
 	private let updater = GitHubReleaseUpdater()
 	private var clipboardHistoryWindowController: ClipboardHistoryWindowController?
+	private var hyperSwitchWindowController: HyperSwitchWindowController?
 	private var pasteFlowWindowController: PasteFlowWindowController?
 	private var isCheckingForUpdates = false
 	private var isDownloadingUpdate = false
@@ -30,19 +36,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		setupStatusBar()
 		setupShortcutsPopover()
 		createMenus()
-		requestKeyboardMonitoringPermissionsIfNeeded()
+		showPermissionGuideOnFirstLaunchIfNeeded()
 		setupDoubleCommandDetection()
 		setupClipboardHistory()
+		setupHyperSwitch()
 		checkForUpdatesAutomatically()
 	}
 	
-	private func requestKeyboardMonitoringPermissionsIfNeeded() {
-		guard !AXIsProcessTrusted() else {
-			return
+	private func showPermissionGuideOnFirstLaunchIfNeeded() {
+		guard SnapFlowPermissionGuide.needsGuide else { return }
+		let key = "didShowPermissionGuide"
+		guard !UserDefaults.standard.bool(forKey: key) else { return }
+		UserDefaults.standard.set(true, forKey: key)
+		DispatchQueue.main.async { [weak self] in
+			self?.showPermissionGuide()
 		}
-
-		let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-		_ = AXIsProcessTrustedWithOptions(options)
 	}
 
 	private func setupStatusBar() {
@@ -65,6 +73,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		}
 
 		let menu = NSMenu()
+		menu.addItem(NSMenuItem(title: "权限引导...", action: #selector(showPermissionGuideFromMenu), keyEquivalent: ""))
 		menu.addItem(NSMenuItem(title: "检查更新...", action: #selector(checkForUpdatesFromMenu), keyEquivalent: ""))
 		let versionItem = NSMenuItem(title: AppVersionLabel.text(), action: nil, keyEquivalent: "")
 		versionItem.isEnabled = false
@@ -105,6 +114,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 	@objc private func checkForUpdatesFromMenu() {
 		checkForUpdates(isAutomatic: false)
+	}
+
+	@objc private func showPermissionGuideFromMenu() {
+		showPermissionGuide()
+	}
+
+	private func showPermissionGuide() {
+		if let controller = permissionGuideWindowController {
+			controller.show()
+			return
+		}
+
+		let controller = PermissionGuideWindowController { [weak self] in
+			self?.permissionGuideWindowController = nil
+		}
+		permissionGuideWindowController = controller
+		controller.show()
 	}
 
 	private func checkForUpdatesAutomatically() {
@@ -252,6 +278,31 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		}
 	}
 
+	private func setupHyperSwitch() {
+		SnapFlowKit.onKeyDown(for: .hyperSwitch) { [weak self] in
+			self?.handleHyperSwitchHotKey()
+		}
+	}
+
+	private func handleHyperSwitchHotKey() {
+		guard !SnapFlowPermissionGuide.needsGuide else {
+			showPermissionGuide()
+			return
+		}
+
+		if let controller = hyperSwitchWindowController, controller.isVisible {
+			controller.activateAndFocus()
+			controller.selectNext()
+			return
+		}
+
+		let controller = HyperSwitchWindowController { [weak self] in
+			self?.hyperSwitchWindowController = nil
+		}
+		hyperSwitchWindowController = controller
+		controller.show()
+	}
+
 	private func showPasteFlowPanel(for text: String) {
 		guard let type = PasteFlowDetector.detect(text) else { return }
 
@@ -340,7 +391,6 @@ final class DoubleCommandHotKey {
 	private var pressCount = 0
 	private var lastPressTime = Date.distantPast
 	private var isCommandDown = false
-	private var didShowPermissionsAlert = false
 	private var localMonitor: Any?
 	private var globalMonitor: Any?
 	private var eventTap: CFMachPort?
@@ -357,8 +407,6 @@ final class DoubleCommandHotKey {
 
 	func start() {
 		stop()
-
-		ensurePermissionsIfPossible()
 		
 		if installEventTap() {
 			return
@@ -399,7 +447,6 @@ final class DoubleCommandHotKey {
 
 	private func installEventTap() -> Bool {
 		guard AXIsProcessTrusted() else {
-			showPermissionsAlertIfNeeded()
 			return false
 		}
 		
@@ -441,34 +488,6 @@ final class DoubleCommandHotKey {
 		return true
 	}
 	
-	private func ensurePermissionsIfPossible() {
-		guard !AXIsProcessTrusted() else {
-			return
-		}
-
-		let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
-		_ = AXIsProcessTrustedWithOptions(options)
-		showPermissionsAlertIfNeeded()
-	}
-	
-	private func showPermissionsAlertIfNeeded() {
-		guard !didShowPermissionsAlert else { return }
-		didShowPermissionsAlert = true
-		
-		DispatchQueue.main.async {
-			let alert = NSAlert()
-			alert.messageText = "需要开启权限才能全局监听双击 ⌘"
-			alert.informativeText = "请在 系统设置 → 隐私与安全性 中，为此 App 开启“辅助功能”与“输入监控”。"
-			alert.addButton(withTitle: "打开系统设置")
-			alert.addButton(withTitle: "稍后")
-			let response = alert.runModal()
-			guard response == .alertFirstButtonReturn else { return }
-			if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility") {
-				NSWorkspace.shared.open(url)
-			}
-		}
-	}
-
 	private func handle(flags: NSEvent.ModifierFlags) {
 		let deviceIndependentFlags = flags.intersection(.deviceIndependentFlagsMask)
 		let commandNowDown = deviceIndependentFlags.contains(.command)

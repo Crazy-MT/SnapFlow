@@ -136,6 +136,11 @@ struct ContentView: View {
 						)
 
 						UsageGuideRow(
+							title: "窗口切换",
+							detail: "按住 Option 后按 Tab 打开横向窗口列表，继续按 Tab 选择下一个窗口，松开 Option 切换到当前选中窗口。"
+						)
+
+						UsageGuideRow(
 							title: "PasteFlow 智能动作",
 							detail: "复制 URL、邮箱、颜色、JSON、算式等内容后，会自动弹出可执行动作，例如打开链接、复制格式化结果。"
 						)
@@ -160,6 +165,14 @@ struct ContentView: View {
 						}
 
 						VStack(spacing: 12) {
+							HStack {
+								Text("窗口切换")
+									.frame(width: 80, alignment: .leading)
+								SnapFlowKit.Recorder(for: .hyperSwitch)
+								Text("显示当前窗口列表")
+									.foregroundColor(.secondary)
+							}
+
 							ShortcutRow(
 								title: "快捷键 1",
 								shortcut: .testShortcut1,
