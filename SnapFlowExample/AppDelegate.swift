@@ -60,7 +60,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 
 	private func setupStatusBar() {
-		statusItem = NSStatusBar.system.statusItem(withLength: 58)
+		statusItem = NSStatusBar.system.statusItem(withLength: 72)
 
 		if let button = statusItem.button {
 			configureStatusBarButton(button)
@@ -115,6 +115,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 			label.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 2),
 			label.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -4),
+			label.widthAnchor.constraint(equalToConstant: 44),
 			label.centerYAnchor.constraint(equalTo: button.centerYAnchor),
 			label.heightAnchor.constraint(equalToConstant: 20)
 		])
@@ -232,7 +233,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 			switch result {
 			case .success(let url):
-				self.showAlert(title: "下载完成", message: "已下载到 \(url.path)，并已启动安装流程。")
+				self.showAlert(title: "下载完成", message: "已下载到 \(url.path)，并已打开安装包或新版本应用。")
 			case .failure(let error):
 				self.showAlert(title: "更新下载失败", message: error.localizedDescription)
 			}
@@ -496,7 +497,21 @@ final class NetworkSpeedMonitor {
 	}
 
 	static func format(_ speed: NetworkSpeed) -> String {
-		"↑\(speed.uploadBytesPerSecond / 1024)KB\n↓\(speed.downloadBytesPerSecond / 1024)KB"
+		"↑\(formatBytesPerSecond(speed.uploadBytesPerSecond))\n↓\(formatBytesPerSecond(speed.downloadBytesPerSecond))"
+	}
+
+	private static func formatBytesPerSecond(_ bytesPerSecond: UInt64) -> String {
+		let units = ["B", "KB", "MB", "GB"]
+		var value = Double(bytesPerSecond)
+		var unitIndex = 0
+
+		while value >= 1000, unitIndex < units.count - 1 {
+			value /= 1024
+			unitIndex += 1
+		}
+
+		let displayedValue = min(Int(value.rounded()), 999)
+		return "\(displayedValue)\(units[unitIndex])"
 	}
 
 	private func poll() {

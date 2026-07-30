@@ -130,6 +130,11 @@ final class GitHubReleaseUpdater {
 		}
 	}
 
+	static func installerCandidate(in directoryURL: URL, fileManager: FileManager = .default) -> URL? {
+		firstItem(in: directoryURL, withExtension: "pkg", fileManager: fileManager)
+			?? firstItem(in: directoryURL, withExtension: "app", fileManager: fileManager)
+	}
+
 	static func latestTagName(fromReleasesPageHTML html: String) -> String? {
 		let pattern = #"/Crazy-MT/SnapFlow/releases/tag/([^"]+)""#
 		guard
@@ -309,9 +314,44 @@ final class GitHubReleaseUpdater {
 		case "dmg":
 			mountDiskImageAndOpenInstaller(at: url, completion: completion)
 		case "zip":
-			complete(open(url), completion: completion)
+			extractArchiveAndOpenInstaller(at: url, completion: completion)
 		default:
 			complete(.failure(UpdaterError.installationLaunchFailed), completion: completion)
+		}
+	}
+
+	private func extractArchiveAndOpenInstaller(at url: URL, completion: @escaping (Result<Void, Error>) -> Void) {
+		DispatchQueue.global(qos: .userInitiated).async {
+			do {
+				let extractionURL = url
+					.deletingLastPathComponent()
+					.appendingPathComponent(url.deletingPathExtension().lastPathComponent, isDirectory: true)
+				if self.fileManager.fileExists(atPath: extractionURL.path) {
+					try self.fileManager.removeItem(at: extractionURL)
+				}
+				try self.fileManager.createDirectory(at: extractionURL, withIntermediateDirectories: true)
+
+				let process = Process()
+				process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+				process.arguments = ["-x", "-k", url.path, extractionURL.path]
+
+				do {
+					try process.run()
+					process.waitUntilExit()
+				} catch {
+					self.complete(.failure(error), completion: completion)
+					return
+				}
+
+				guard process.terminationStatus == 0 else {
+					self.complete(.failure(UpdaterError.installationLaunchFailed), completion: completion)
+					return
+				}
+
+				self.openInstallerCandidate(in: extractionURL, fallbackURL: extractionURL, completion: completion)
+			} catch {
+				self.complete(.failure(error), completion: completion)
+			}
 		}
 	}
 
@@ -345,14 +385,19 @@ final class GitHubReleaseUpdater {
 				return
 			}
 
-			if let packageURL = self.firstItem(in: volumeURL, withExtension: "pkg") {
-				self.complete(self.open(packageURL), completion: completion)
-			} else if let appURL = self.firstItem(in: volumeURL, withExtension: "app") {
-				self.workspace.activateFileViewerSelecting([appURL])
-				self.complete(.success(()), completion: completion)
-			} else {
-				self.complete(self.open(volumeURL), completion: completion)
-			}
+			self.openInstallerCandidate(in: volumeURL, fallbackURL: volumeURL, completion: completion)
+		}
+	}
+
+	private func openInstallerCandidate(
+		in directoryURL: URL,
+		fallbackURL: URL,
+		completion: @escaping (Result<Void, Error>) -> Void
+	) {
+		if let installerURL = Self.installerCandidate(in: directoryURL, fileManager: fileManager) {
+			complete(open(installerURL), completion: completion)
+		} else {
+			complete(open(fallbackURL), completion: completion)
 		}
 	}
 
@@ -373,7 +418,11 @@ final class GitHubReleaseUpdater {
 		}
 	}
 
-	private func firstItem(in directoryURL: URL, withExtension pathExtension: String) -> URL? {
+	private static func firstItem(
+		in directoryURL: URL,
+		withExtension pathExtension: String,
+		fileManager: FileManager
+	) -> URL? {
 		guard
 			let enumerator = fileManager.enumerator(
 				at: directoryURL,

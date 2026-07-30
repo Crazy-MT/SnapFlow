@@ -49,23 +49,26 @@ jobs:
             PROVISIONING_PROFILE_SPECIFIER="" \
             SKIP_INSTALL=NO
 
-      - name: Package app
+      - name: Package installer
         env:
           ARCHIVE_PATH: ${{ runner.temp }}/SnapFlow.xcarchive
           EXPORT_PATH: ${{ runner.temp }}/SnapFlow-release
-          ZIP_PATH: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ env.RELEASE_TAG }}.zip
+          PKG_PATH: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ env.RELEASE_TAG }}.pkg
         run: |
           set -euo pipefail
           APP_PATH="$ARCHIVE_PATH/Products/Applications/SnapFlow.app"
 
           test -d "$APP_PATH"
           mkdir -p "$EXPORT_PATH"
-          ditto -c -k --keepParent "$APP_PATH" "$ZIP_PATH"
+          productbuild \
+            --component "$APP_PATH" \
+            /Applications \
+            "$PKG_PATH"
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.RELEASE_TAG }}
           name: SnapFlow ${{ env.RELEASE_TAG }}
-          files: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ env.RELEASE_TAG }}.zip
+          files: ${{ runner.temp }}/SnapFlow-release/SnapFlow-${{ env.RELEASE_TAG }}.pkg
           generate_release_notes: true

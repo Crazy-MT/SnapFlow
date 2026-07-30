@@ -104,10 +104,46 @@ final class GitHubReleaseUpdaterTests: XCTestCase {
 		)
 	}
 
+	func testInstallerCandidatePrefersPkgThenApp() throws {
+		let rootURL = try temporaryDirectory()
+		let appURL = rootURL.appendingPathComponent("SnapFlow.app", isDirectory: true)
+		let packageURL = rootURL.appendingPathComponent("SnapFlow.pkg", isDirectory: true)
+		try FileManager.default.createDirectory(at: appURL, withIntermediateDirectories: true)
+		try FileManager.default.createDirectory(at: packageURL, withIntermediateDirectories: true)
+
+		XCTAssertEqual(
+			GitHubReleaseUpdater.installerCandidate(in: rootURL)?.standardizedFileURL,
+			packageURL.standardizedFileURL
+		)
+	}
+
+	func testInstallerCandidateFallsBackToApp() throws {
+		let rootURL = try temporaryDirectory()
+		let appURL = rootURL
+			.appendingPathComponent("Nested", isDirectory: true)
+			.appendingPathComponent("SnapFlow.app", isDirectory: true)
+		try FileManager.default.createDirectory(at: appURL, withIntermediateDirectories: true)
+
+		XCTAssertEqual(
+			GitHubReleaseUpdater.installerCandidate(in: rootURL)?.standardizedFileURL,
+			appURL.standardizedFileURL
+		)
+	}
+
 	private func asset(named name: String) -> GitHubReleaseAsset {
 		GitHubReleaseAsset(
 			name: name,
 			browserDownloadURL: URL(string: "https://example.com/\(name)")!
 		)
+	}
+
+	private func temporaryDirectory() throws -> URL {
+		let url = FileManager.default.temporaryDirectory
+			.appendingPathComponent(UUID().uuidString, isDirectory: true)
+		try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+		addTeardownBlock {
+			try? FileManager.default.removeItem(at: url)
+		}
+		return url
 	}
 }
