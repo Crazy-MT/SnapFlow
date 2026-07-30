@@ -131,8 +131,11 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 	private var isClosing = false
 	private weak var scrollView: NSScrollView?
 	private weak var hintLabel: NSTextField?
-	private var stackView: NSStackView?
+	private var gridView: HyperSwitchGridView?
+	private var gridHeightConstraint: NSLayoutConstraint?
 	private var rowViews = [NSView]()
+	private static let cardSize = NSSize(width: 196, height: 204)
+	private static let cardSpacing: CGFloat = 14
 
 	var isVisible: Bool {
 		guard let window else { return false }
@@ -141,22 +144,22 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 
 	init(onClose: @escaping () -> Void) {
 		self.onClose = onClose
-			self.windows = HyperSwitchWindowProvider.visibleWindows()
+		self.windows = HyperSwitchWindowProvider.visibleWindows()
 
-			let window = KeyableWindow(
-				contentRect: CGRect(x: 0, y: 0, width: 1016, height: 332),
-				styleMask: [.borderless],
-				backing: .buffered,
-				defer: false
+		let window = KeyableWindow(
+			contentRect: CGRect(x: 0, y: 0, width: 1280, height: 760),
+			styleMask: [.borderless],
+			backing: .buffered,
+			defer: false
 		)
-			window.title = "HyperSwitch"
-			window.center()
-			window.isMovableByWindowBackground = true
-			window.level = .floating
-			window.isOpaque = false
-			window.backgroundColor = .clear
-			window.hasShadow = false
-			window.collectionBehavior = [.canJoinAllSpaces, .transient, .ignoresCycle]
+		window.title = "HyperSwitch"
+		window.center()
+		window.isMovableByWindowBackground = true
+		window.level = .floating
+		window.isOpaque = false
+		window.backgroundColor = .clear
+		window.hasShadow = false
+		window.collectionBehavior = [.canJoinAllSpaces, .transient, .ignoresCycle]
 
 		super.init(window: window)
 
@@ -176,6 +179,9 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		window?.alphaValue = 0
 		window?.center()
 		window?.makeKeyAndOrderFront(nil)
+		window?.layoutIfNeeded()
+		updateDocumentSize()
+		updateSelection()
 		NSApp.activate(ignoringOtherApps: true)
 
 		NSAnimationContext.runAnimationGroup { context in
@@ -261,21 +267,23 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		self.hintLabel = hintLabel
 		contentView.addSubview(hintLabel)
 
-		let stackView = NSStackView()
-		stackView.translatesAutoresizingMaskIntoConstraints = false
-		stackView.orientation = .horizontal
-		stackView.alignment = .top
-		stackView.spacing = 10
-		stackView.edgeInsets = NSEdgeInsets(top: 0, left: 8, bottom: 0, right: 0)
-		self.stackView = stackView
+		let gridView = HyperSwitchGridView(
+			cardSize: Self.cardSize,
+			spacing: Self.cardSpacing
+		)
+		gridView.translatesAutoresizingMaskIntoConstraints = false
+		let gridHeightConstraint = gridView.heightAnchor.constraint(equalToConstant: Self.cardSize.height)
+		self.gridHeightConstraint = gridHeightConstraint
+		self.gridView = gridView
 
 		let scrollView = NSScrollView()
 		scrollView.translatesAutoresizingMaskIntoConstraints = false
 		scrollView.drawsBackground = false
 		scrollView.borderType = .noBorder
-		scrollView.hasHorizontalScroller = true
+		scrollView.hasHorizontalScroller = false
 		scrollView.hasVerticalScroller = false
-		scrollView.documentView = stackView
+		scrollView.autohidesScrollers = true
+		scrollView.documentView = gridView
 		self.scrollView = scrollView
 		contentView.addSubview(scrollView)
 
@@ -307,9 +315,10 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 			scrollView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 14),
 			scrollView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
 
-			stackView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
-			stackView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
-			stackView.bottomAnchor.constraint(lessThanOrEqualTo: scrollView.contentView.bottomAnchor)
+			gridView.leadingAnchor.constraint(equalTo: scrollView.contentView.leadingAnchor),
+			gridView.trailingAnchor.constraint(equalTo: scrollView.contentView.trailingAnchor),
+			gridView.topAnchor.constraint(equalTo: scrollView.contentView.topAnchor),
+			gridHeightConstraint
 		])
 
 		keyDownMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
@@ -352,13 +361,13 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		updateHint()
 		rowViews.forEach { $0.removeFromSuperview() }
 		rowViews = windows.enumerated().map(makeRow)
-		rowViews.forEach { stackView?.addArrangedSubview($0) }
+		gridView?.setCards(rowViews)
 
 		if windows.isEmpty {
 			let emptyLabel = NSTextField(labelWithString: "没有可切换的窗口")
 			emptyLabel.textColor = .secondaryLabelColor
-			stackView?.addArrangedSubview(emptyLabel)
 			rowViews = [emptyLabel]
+			gridView?.setCards(rowViews)
 		}
 
 		updateDocumentSize()
@@ -376,55 +385,52 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 
 	private func makeRow(index: Int, item: HyperSwitchWindow) -> NSView {
 		let card = HyperSwitchCardView(index: index)
-		card.translatesAutoresizingMaskIntoConstraints = false
+		card.translatesAutoresizingMaskIntoConstraints = true
 		card.target = self
 		card.action = #selector(rowClicked(_:))
 
-			let preview = HyperSwitchPreviewView()
-			preview.translatesAutoresizingMaskIntoConstraints = false
-			preview.setPreview(item.snapshot, fallback: item.icon)
-			card.contentView.addSubview(preview)
+		let preview = HyperSwitchPreviewView()
+		preview.translatesAutoresizingMaskIntoConstraints = false
+		preview.setPreview(item.snapshot, fallback: item.icon)
+		card.contentView.addSubview(preview)
 
-			let iconView = NSImageView()
-			iconView.translatesAutoresizingMaskIntoConstraints = false
-			iconView.image = item.icon
-			card.contentView.addSubview(iconView)
+		let iconView = NSImageView()
+		iconView.translatesAutoresizingMaskIntoConstraints = false
+		iconView.image = item.icon
+		card.contentView.addSubview(iconView)
 
-			let appLabel = NSTextField(labelWithString: item.appName)
-			appLabel.translatesAutoresizingMaskIntoConstraints = false
-			appLabel.font = NSFont.systemFont(ofSize: 13, weight: .semibold)
-			appLabel.lineBreakMode = .byTruncatingTail
-			card.contentView.addSubview(appLabel)
+		let appLabel = NSTextField(labelWithString: item.appName)
+		appLabel.translatesAutoresizingMaskIntoConstraints = false
+		appLabel.font = NSFont.systemFont(ofSize: 13, weight: .semibold)
+		appLabel.lineBreakMode = .byTruncatingTail
+		card.contentView.addSubview(appLabel)
 
-			let titleLabel = NSTextField(labelWithString: item.title)
-			titleLabel.translatesAutoresizingMaskIntoConstraints = false
-			titleLabel.font = NSFont.systemFont(ofSize: 12, weight: .regular)
-			titleLabel.textColor = .secondaryLabelColor
-			titleLabel.lineBreakMode = .byTruncatingTail
-			card.contentView.addSubview(titleLabel)
+		let titleLabel = NSTextField(labelWithString: item.title)
+		titleLabel.translatesAutoresizingMaskIntoConstraints = false
+		titleLabel.font = NSFont.systemFont(ofSize: 12, weight: .regular)
+		titleLabel.textColor = .secondaryLabelColor
+		titleLabel.lineBreakMode = .byTruncatingTail
+		card.contentView.addSubview(titleLabel)
 
 		NSLayoutConstraint.activate([
-			card.widthAnchor.constraint(equalToConstant: 176),
-			card.heightAnchor.constraint(equalToConstant: 180),
+			preview.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 8),
+			preview.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -8),
+			preview.topAnchor.constraint(equalTo: card.contentView.topAnchor, constant: 8),
+			preview.heightAnchor.constraint(equalToConstant: 126),
 
-				preview.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 8),
-				preview.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -8),
-				preview.topAnchor.constraint(equalTo: card.contentView.topAnchor, constant: 8),
-				preview.heightAnchor.constraint(equalToConstant: 104),
+			iconView.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 10),
+			iconView.topAnchor.constraint(equalTo: preview.bottomAnchor, constant: 10),
+			iconView.widthAnchor.constraint(equalToConstant: 28),
+			iconView.heightAnchor.constraint(equalToConstant: 28),
 
-				iconView.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 10),
-				iconView.topAnchor.constraint(equalTo: preview.bottomAnchor, constant: 10),
-				iconView.widthAnchor.constraint(equalToConstant: 28),
-				iconView.heightAnchor.constraint(equalToConstant: 28),
+			appLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 8),
+			appLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -10),
+			appLabel.topAnchor.constraint(equalTo: iconView.topAnchor),
 
-				appLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 8),
-				appLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -10),
-				appLabel.topAnchor.constraint(equalTo: iconView.topAnchor),
-
-				titleLabel.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 10),
-				titleLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -10),
-				titleLabel.topAnchor.constraint(equalTo: iconView.bottomAnchor, constant: 8)
-			])
+			titleLabel.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 10),
+			titleLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -10),
+			titleLabel.topAnchor.constraint(equalTo: iconView.bottomAnchor, constant: 8)
+		])
 
 		return card
 	}
@@ -458,8 +464,11 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 	}
 
 	private func updateDocumentSize() {
-		let width = CGFloat(max(rowViews.count, 1)) * 186 - 2
-		stackView?.setFrameSize(NSSize(width: width, height: 180))
+		guard let scrollView, let gridView else { return }
+		let width = max(scrollView.contentView.bounds.width, 1)
+		let height = gridView.preferredHeight(for: width)
+		gridHeightConstraint?.constant = height
+		gridView.needsLayout = true
 	}
 
 	private func scrollSelectedCardIntoView() {
@@ -499,6 +508,54 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 
 	func windowDidResignKey(_ notification: Notification) {
 		closeWindow()
+	}
+}
+
+final class HyperSwitchGridView: NSView {
+	private let cardSize: NSSize
+	private let spacing: CGFloat
+	private var cards = [NSView]()
+
+	init(cardSize: NSSize, spacing: CGFloat) {
+		self.cardSize = cardSize
+		self.spacing = spacing
+		super.init(frame: .zero)
+	}
+
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+
+	override var isFlipped: Bool {
+		true
+	}
+
+	func setCards(_ cards: [NSView]) {
+		self.cards.forEach { $0.removeFromSuperview() }
+		self.cards = cards
+		cards.forEach { addSubview($0) }
+		needsLayout = true
+	}
+
+	func preferredHeight(for width: CGFloat) -> CGFloat {
+		let columnCount = max(1, Int((width + spacing) / (cardSize.width + spacing)))
+		let rowCount = Int(ceil(Double(max(cards.count, 1)) / Double(columnCount)))
+		return CGFloat(rowCount) * cardSize.height + CGFloat(max(rowCount - 1, 0)) * spacing
+	}
+
+	override func layout() {
+		super.layout()
+		let columnCount = max(1, Int((bounds.width + spacing) / (cardSize.width + spacing)))
+		for (index, card) in cards.enumerated() {
+			let column = index % columnCount
+			let row = index / columnCount
+			card.frame = NSRect(
+				x: CGFloat(column) * (cardSize.width + spacing),
+				y: CGFloat(row) * (cardSize.height + spacing),
+				width: cardSize.width,
+				height: cardSize.height
+			)
+		}
 	}
 }
 
@@ -637,10 +694,17 @@ final class HyperSwitchPreviewView: NSView {
 		layer?.masksToBounds = true
 		layer?.backgroundColor = NSColor.black.withAlphaComponent(0.18).cgColor
 		layer?.contentsGravity = .resizeAspect
+		layer?.minificationFilter = .trilinear
+		layer?.magnificationFilter = .linear
 	}
 
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
+	}
+
+	override func viewDidMoveToWindow() {
+		super.viewDidMoveToWindow()
+		layer?.contentsScale = window?.backingScaleFactor ?? NSScreen.main?.backingScaleFactor ?? 2
 	}
 
 	func setPreview(_ snapshot: CGImage?, fallback icon: NSImage) {
