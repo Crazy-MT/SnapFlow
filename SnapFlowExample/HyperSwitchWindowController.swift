@@ -136,6 +136,7 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 	private var rowViews = [NSView]()
 	private static let cardSize = NSSize(width: 196, height: 204)
 	private static let cardSpacing: CGFloat = 14
+	private static let initialWindowSize = NSSize(width: 1280, height: 360)
 
 	var isVisible: Bool {
 		guard let window else { return false }
@@ -147,7 +148,7 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		self.windows = HyperSwitchWindowProvider.visibleWindows()
 
 		let window = KeyableWindow(
-			contentRect: CGRect(x: 0, y: 0, width: 1280, height: 760),
+			contentRect: CGRect(origin: .zero, size: Self.initialWindowSize),
 			styleMask: [.borderless],
 			backing: .buffered,
 			defer: false
@@ -177,11 +178,11 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		HyperSwitchWindowProvider.requestScreenCaptureAccessIfNeeded()
 		reloadWindows()
 		window?.alphaValue = 0
-		window?.center()
 		window?.makeKeyAndOrderFront(nil)
 		window?.layoutIfNeeded()
 		updateDocumentSize()
 		updateSelection()
+		window?.center()
 		NSApp.activate(ignoringOtherApps: true)
 
 		NSAnimationContext.runAnimationGroup { context in
@@ -468,7 +469,25 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		let width = max(scrollView.contentView.bounds.width, 1)
 		let height = gridView.preferredHeight(for: width)
 		gridHeightConstraint?.constant = height
-		gridView.needsLayout = true
+		resizeWindowToFitGrid(height: height)
+		gridView.layoutSubtreeIfNeeded()
+	}
+
+	private func resizeWindowToFitGrid(height gridHeight: CGFloat) {
+		guard let window, let scrollView else { return }
+		window.layoutIfNeeded()
+
+		let screenHeight = window.screen?.visibleFrame.height ?? NSScreen.main?.visibleFrame.height ?? 900
+		let maxWindowHeight = min(screenHeight - 80, 780)
+		let chromeHeight = window.frame.height - scrollView.frame.height
+		let targetHeight = min(maxWindowHeight, ceil(chromeHeight + gridHeight))
+		scrollView.hasVerticalScroller = gridHeight > scrollView.contentView.bounds.height + 0.5
+		guard abs(window.frame.height - targetHeight) > 0.5 else { return }
+
+		var frame = window.frame
+		frame.origin.y += frame.height - targetHeight
+		frame.size.height = targetHeight
+		window.setFrame(frame, display: true, animate: false)
 	}
 
 	private func scrollSelectedCardIntoView() {
