@@ -232,8 +232,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 			self.isDownloadingUpdate = false
 
 			switch result {
-			case .success(let url):
-				self.showAlert(title: "下载完成", message: "已下载到 \(url.path)，并已打开安装包或新版本应用。")
+			case .success:
+				self.showAlert(
+					title: "下载完成",
+					message: "安装器已打开。点击“确定”后 SnapFlow 会自动退出，请继续在安装器中完成更新。"
+				)
+				NSApp.terminate(nil)
 			case .failure(let error):
 				self.showAlert(title: "更新下载失败", message: error.localizedDescription)
 			}
