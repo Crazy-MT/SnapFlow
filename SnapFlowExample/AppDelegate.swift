@@ -126,7 +126,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		popover.behavior = .transient
 		popover.animates = true
 		popover.contentSize = NSSize(width: 560, height: 420)
-		popover.contentViewController = NSHostingController(rootView: ContentView(model: shortcutActionsModel))
+                popover.contentViewController = NSHostingController(
+                        rootView: ContentView(
+                                model: shortcutActionsModel,
+                                onShowHyperSwitchPreview: { [weak self] in
+                                        self?.showHyperSwitchPreviewFromDebugButton()
+                                }
+                        )
+                )
 		shortcutsPopover = popover
 	}
 
@@ -360,6 +367,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 			controller.selectNext()
 			return
 		}
+
+                showHyperSwitchPreviewWindow()
+        }
+
+        private func showHyperSwitchPreviewFromDebugButton() {
+                shortcutsPopover.performClose(nil)
+                showHyperSwitchPreviewWindow()
+        }
+
+        private func showHyperSwitchPreviewWindow() {
+                guard !SnapFlowPermissionGuide.needsGuide else {
+                        showPermissionGuide()
+                        return
+                }
+
+                if let controller = hyperSwitchWindowController, controller.isVisible {
+                        controller.activateAndFocus()
+                        return
+                }
 
 		let controller = HyperSwitchWindowController { [weak self] in
 			self?.hyperSwitchWindowController = nil

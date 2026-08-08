@@ -134,9 +134,10 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 	private var gridView: HyperSwitchGridView?
 	private var gridHeightConstraint: NSLayoutConstraint?
 	private var rowViews = [NSView]()
-	private static let cardSize = NSSize(width: 196, height: 204)
+        private static let cardSize = NSSize(width: 240, height: 196)
 	private static let cardSpacing: CGFloat = 14
-	private static let initialWindowSize = NSSize(width: 1280, height: 360)
+        private static let initialWindowSize = NSSize(width: 720, height: 390)
+        private static let windowHorizontalChrome: CGFloat = 96
 
 	var isVisible: Bool {
 		guard let window else { return false }
@@ -236,7 +237,7 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 			glassView.style = .regular
 			glassView.cornerRadius = 24
 			glassView.clipsToBounds = true
-			glassView.tintColor = NSColor.windowBackgroundColor.withAlphaComponent(0.14)
+                        glassView.tintColor = NSColor.windowBackgroundColor.withAlphaComponent(0.10)
 			glassView.contentView = contentView
 			backgroundView = glassView
 		} else {
@@ -244,11 +245,11 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 			visualEffectView.translatesAutoresizingMaskIntoConstraints = false
 			visualEffectView.state = .active
 			visualEffectView.blendingMode = .behindWindow
-			visualEffectView.material = .popover
+                        visualEffectView.material = .popover
 			visualEffectView.wantsLayer = true
 			visualEffectView.layer?.cornerRadius = 24
 			visualEffectView.layer?.borderWidth = 1
-			visualEffectView.layer?.borderColor = NSColor.white.withAlphaComponent(0.35).cgColor
+                        visualEffectView.layer?.borderColor = NSColor.white.withAlphaComponent(0.22).cgColor
 			visualEffectView.layer?.masksToBounds = true
 			visualEffectView.addSubview(contentView)
 			backgroundView = visualEffectView
@@ -414,22 +415,22 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 		card.contentView.addSubview(titleLabel)
 
 		NSLayoutConstraint.activate([
-			preview.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 8),
-			preview.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -8),
-			preview.topAnchor.constraint(equalTo: card.contentView.topAnchor, constant: 8),
-			preview.heightAnchor.constraint(equalToConstant: 126),
+                        preview.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 18),
+                        preview.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -18),
+                        preview.topAnchor.constraint(equalTo: card.contentView.topAnchor, constant: 4),
+                        preview.heightAnchor.constraint(equalTo: preview.widthAnchor, multiplier: 9.0 / 16.0),
 
-			iconView.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 10),
-			iconView.topAnchor.constraint(equalTo: preview.bottomAnchor, constant: 10),
+                        iconView.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 18),
+                        iconView.topAnchor.constraint(equalTo: preview.bottomAnchor, constant: 8),
 			iconView.widthAnchor.constraint(equalToConstant: 28),
 			iconView.heightAnchor.constraint(equalToConstant: 28),
 
 			appLabel.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 8),
-			appLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -10),
-			appLabel.topAnchor.constraint(equalTo: iconView.topAnchor),
+                        appLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -18),
+                        appLabel.centerYAnchor.constraint(equalTo: iconView.centerYAnchor),
 
-			titleLabel.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 10),
-			titleLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -10),
+                        titleLabel.leadingAnchor.constraint(equalTo: card.contentView.leadingAnchor, constant: 18),
+                        titleLabel.trailingAnchor.constraint(equalTo: card.contentView.trailingAnchor, constant: -18),
 			titleLabel.topAnchor.constraint(equalTo: iconView.bottomAnchor, constant: 8)
 		])
 
@@ -466,26 +467,40 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 
 	private func updateDocumentSize() {
 		guard let scrollView, let gridView else { return }
-		let width = max(scrollView.contentView.bounds.width, 1)
-		let height = gridView.preferredHeight(for: width)
+                window?.layoutIfNeeded()
+                let screenWidth = window?.screen?.visibleFrame.width ?? NSScreen.main?.visibleFrame.width ?? 1440
+                let maxWindowWidth = max(420, screenWidth - 80)
+                let maxGridWidth = max(1, maxWindowWidth - Self.windowHorizontalChrome)
+                let width = gridView.preferredWidth(maxWidth: maxGridWidth)
+                let height = gridView.preferredHeight(for: width)
 		gridHeightConstraint?.constant = height
-		resizeWindowToFitGrid(height: height)
+                resizeWindowToFitGrid(width: width, height: height)
 		gridView.layoutSubtreeIfNeeded()
 	}
 
-	private func resizeWindowToFitGrid(height gridHeight: CGFloat) {
+        private func resizeWindowToFitGrid(width gridWidth: CGFloat, height gridHeight: CGFloat) {
 		guard let window, let scrollView else { return }
 		window.layoutIfNeeded()
 
+                let screenWidth = window.screen?.visibleFrame.width ?? NSScreen.main?.visibleFrame.width ?? 1440
 		let screenHeight = window.screen?.visibleFrame.height ?? NSScreen.main?.visibleFrame.height ?? 900
+                let maxWindowWidth = min(screenWidth - 80, 1480)
 		let maxWindowHeight = min(screenHeight - 80, 780)
 		let chromeHeight = window.frame.height - scrollView.frame.height
+                let targetWidth = min(maxWindowWidth, ceil(Self.windowHorizontalChrome + gridWidth))
 		let targetHeight = min(maxWindowHeight, ceil(chromeHeight + gridHeight))
 		scrollView.hasVerticalScroller = gridHeight > scrollView.contentView.bounds.height + 0.5
-		guard abs(window.frame.height - targetHeight) > 0.5 else { return }
+                guard
+                        abs(window.frame.width - targetWidth) > 0.5 ||
+                        abs(window.frame.height - targetHeight) > 0.5
+                else {
+                        return
+                }
 
 		var frame = window.frame
+                frame.origin.x += (frame.width - targetWidth) / 2
 		frame.origin.y += frame.height - targetHeight
+                frame.size.width = targetWidth
 		frame.size.height = targetHeight
 		window.setFrame(frame, display: true, animate: false)
 	}
@@ -533,6 +548,8 @@ final class HyperSwitchWindowController: NSWindowController, NSWindowDelegate {
 final class HyperSwitchGridView: NSView {
 	private let cardSize: NSSize
 	private let spacing: CGFloat
+        private let preferredColumnCount = 7
+        private let leadingInset: CGFloat = 20
 	private var cards = [NSView]()
 
 	init(cardSize: NSSize, spacing: CGFloat) {
@@ -556,22 +573,37 @@ final class HyperSwitchGridView: NSView {
 		needsLayout = true
 	}
 
+        func preferredWidth(maxWidth: CGFloat) -> CGFloat {
+                let columnCount = min(max(cards.count, 1), preferredColumnCount)
+                let idealWidth = CGFloat(columnCount) * cardSize.width
+                        + CGFloat(max(columnCount - 1, 0)) * spacing
+                        + leadingInset
+                return min(maxWidth, idealWidth)
+        }
+
 	func preferredHeight(for width: CGFloat) -> CGFloat {
-		let columnCount = max(1, Int((width + spacing) / (cardSize.width + spacing)))
+                let itemCount = max(cards.count, 1)
+                let columnCount = min(itemCount, preferredColumnCount)
 		let rowCount = Int(ceil(Double(max(cards.count, 1)) / Double(columnCount)))
 		return CGFloat(rowCount) * cardSize.height + CGFloat(max(rowCount - 1, 0)) * spacing
 	}
 
 	override func layout() {
 		super.layout()
-		let columnCount = max(1, Int((bounds.width + spacing) / (cardSize.width + spacing)))
+                let columnCount = min(max(cards.count, 1), preferredColumnCount)
+                let totalSpacing = CGFloat(max(columnCount - 1, 0)) * spacing
+                let availableWidth = max(0, bounds.width - leadingInset)
+                let cardWidth = max(0, (availableWidth - totalSpacing) / CGFloat(columnCount))
 		for (index, card) in cards.enumerated() {
 			let column = index % columnCount
 			let row = index / columnCount
+                        let itemsInRow = min(columnCount, max(cards.count - row * columnCount, 0))
+                        let rowWidth = CGFloat(itemsInRow) * cardWidth + CGFloat(max(itemsInRow - 1, 0)) * spacing
+                        let rowInset = max(0, (availableWidth - rowWidth) / 2)
 			card.frame = NSRect(
-				x: CGFloat(column) * (cardSize.width + spacing),
+                                x: leadingInset + rowInset + CGFloat(column) * (cardWidth + spacing),
 				y: CGFloat(row) * (cardSize.height + spacing),
-				width: cardSize.width,
+                                width: cardWidth,
 				height: cardSize.height
 			)
 		}
@@ -602,7 +634,7 @@ final class HyperSwitchCardView: NSView {
 				glassView.style = .clear
 				glassView.cornerRadius = 14
 				glassView.clipsToBounds = true
-				glassView.tintColor = NSColor.white.withAlphaComponent(0.16)
+                                glassView.tintColor = NSColor.white.withAlphaComponent(0.10)
 				glassView.contentView = contentView
 			self.glassView = glassView
 			addSubview(glassView)
@@ -619,8 +651,8 @@ final class HyperSwitchCardView: NSView {
 		} else {
 			layer?.cornerRadius = 14
 			layer?.borderWidth = 1
-			layer?.borderColor = NSColor.white.withAlphaComponent(0.22).cgColor
-			layer?.backgroundColor = NSColor.white.withAlphaComponent(0.14).cgColor
+                        layer?.borderColor = NSColor.white.withAlphaComponent(0.18).cgColor
+                        layer?.backgroundColor = NSColor.white.withAlphaComponent(0.08).cgColor
 			addSubview(contentView)
 			NSLayoutConstraint.activate([
 				contentView.leadingAnchor.constraint(equalTo: leadingAnchor),
@@ -652,18 +684,19 @@ final class HyperSwitchCardView: NSView {
 	}
 
 	func setSelected(_ selected: Bool) {
+                let selectedTint = NSColor(calibratedRed: 0.56, green: 0.76, blue: 0.98, alpha: 1)
 		if #available(macOS 26.0, *), let glassView = glassView as? NSGlassEffectView {
 			glassView.style = selected ? .regular : .clear
 			glassView.tintColor = selected
-				? NSColor.controlAccentColor.withAlphaComponent(0.24)
-				: NSColor.white.withAlphaComponent(0.16)
+                                ? selectedTint.withAlphaComponent(0.18)
+                                : NSColor.white.withAlphaComponent(0.10)
 		}
 		layer?.backgroundColor = selected
-			? NSColor.controlAccentColor.withAlphaComponent(0.18).cgColor
+                        ? selectedTint.withAlphaComponent(0.12).cgColor
 			: NSColor.clear.cgColor
 		layer?.borderColor = selected
-			? NSColor.controlAccentColor.withAlphaComponent(0.75).cgColor
-			: NSColor.white.withAlphaComponent(0.22).cgColor
+                        ? selectedTint.withAlphaComponent(0.62).cgColor
+                        : NSColor.white.withAlphaComponent(0.18).cgColor
 		layer?.shadowOpacity = selected ? 0.24 : 0
 	}
 }
@@ -728,7 +761,7 @@ final class HyperSwitchPreviewView: NSView {
 
 	func setPreview(_ snapshot: CGImage?, fallback icon: NSImage) {
 		if let snapshot {
-			layer?.contentsGravity = .resizeAspect
+                        layer?.contentsGravity = .resizeAspectFill
 			layer?.contents = snapshot
 			return
 		}

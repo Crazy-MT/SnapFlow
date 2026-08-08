@@ -110,6 +110,7 @@ struct UsageGuideRow: View {
 
 struct ContentView: View {
 	@ObservedObject var model: ShortcutActionsModel
+        let onShowHyperSwitchPreview: () -> Void
 
 	var body: some View {
 		ScrollView {
@@ -169,6 +170,9 @@ struct ContentView: View {
 								Text("窗口切换")
 									.frame(width: 80, alignment: .leading)
 								SnapFlowKit.Recorder(for: .hyperSwitch)
+                                                                Button("调试预览") {
+                                                                        onShowHyperSwitchPreview()
+                                                                }
 								Text("显示当前窗口列表")
 									.foregroundColor(.secondary)
 							}
