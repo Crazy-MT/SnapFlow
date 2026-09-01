@@ -10,6 +10,8 @@
 		E3500C3624DEDCEF00F4B055 /* SnapFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3500C3524DEDCEF00F4B055 /* SnapFlowTests.swift */; };
 		E3500C3824DEDCEF00F4B055 /* SnapFlowKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapFlowKit::SnapFlowKit::Product" /* SnapFlowKit.framework */; };
 		E3500C3F24DEDDEC00F4B055 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3500C3E24DEDDEC00F4B055 /* Utilities.swift */; };
+		E7A000262A00000000000001 /* ClipboardMonitoringPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000272A00000000000001 /* ClipboardMonitoringPreference.swift */; };
+		E7A000242A00000000000001 /* ClipboardMonitoringPreferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000252A00000000000001 /* ClipboardMonitoringPreferenceTests.swift */; };
 		E7A000052A00000000000001 /* ClipboardHistorySelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */; };
 		E7A000072A00000000000001 /* ClipboardHistorySelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000082A00000000000001 /* ClipboardHistorySelection.swift */; };
 		E7A000092A00000000000001 /* ClipboardHistorySelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000082A00000000000001 /* ClipboardHistorySelection.swift */; };
@@ -79,6 +81,8 @@
 		E3500C3524DEDCEF00F4B055 /* SnapFlowTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SnapFlowTests.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3500C3724DEDCEF00F4B055 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E3500C3E24DEDDEC00F4B055 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Utilities.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000272A00000000000001 /* ClipboardMonitoringPreference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardMonitoringPreference.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000252A00000000000001 /* ClipboardMonitoringPreferenceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardMonitoringPreferenceTests.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardHistorySelectionTests.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000082A00000000000001 /* ClipboardHistorySelection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardHistorySelection.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E7A000002A00000000000001 /* SearchEngineTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SearchEngineTests.swift; sourceTree = "<group>"; usesTabs = 1; };
@@ -142,6 +146,7 @@
 			isa = PBXGroup;
 			children = (
 				E3500C3524DEDCEF00F4B055 /* SnapFlowTests.swift */,
+				E7A000252A00000000000001 /* ClipboardMonitoringPreferenceTests.swift */,
 				E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */,
 				E7A000002A00000000000001 /* SearchEngineTests.swift */,
 				E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */,
@@ -214,6 +219,7 @@
 			isa = PBXGroup;
 			children = (
 				OBJ_9 /* SnapFlowKit.swift */,
+				E7A000272A00000000000001 /* ClipboardMonitoringPreference.swift */,
 				E3BF562C245C29C30024D9BF /* CarbonSnapFlowKit.swift */,
 				E38103FD246449180023E9A8 /* Name.swift */,
 				E3BF564B245C34B30024D9BF /* Key.swift */,
@@ -402,6 +408,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E3500C3F24DEDDEC00F4B055 /* Utilities.swift in Sources */,
+				E7A000242A00000000000001 /* ClipboardMonitoringPreferenceTests.swift in Sources */,
 				E7A000052A00000000000001 /* ClipboardHistorySelectionTests.swift in Sources */,
 				E7A000092A00000000000001 /* ClipboardHistorySelection.swift in Sources */,
 				E7A000042A00000000000001 /* SearchEngine.swift in Sources */,
@@ -435,6 +442,7 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_23 /* SnapFlowKit.swift in Sources */,
+				E7A000262A00000000000001 /* ClipboardMonitoringPreference.swift in Sources */,
 				E3BF562D245C29C30024D9BF /* CarbonSnapFlowKit.swift in Sources */,
 				OBJ_24 /* util.swift in Sources */,
 				E3AD497024705C7600F51C0D /* NSMenuItem++.swift in Sources */,
@@ -622,7 +630,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-					MARKETING_VERSION = 0.6.7;
+					MARKETING_VERSION = 0.6.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creazymt.snapflow;
@@ -692,7 +700,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-					MARKETING_VERSION = 0.6.7;
+					MARKETING_VERSION = 0.6.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creazymt.snapflow;
@@ -720,7 +728,7 @@
 					"$(inherited)",
 					"$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
 				);
-					MARKETING_VERSION = 0.6.7;
+					MARKETING_VERSION = 0.6.8;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -755,7 +763,7 @@
 					"$(inherited)",
 					"$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
 				);
-					MARKETING_VERSION = 0.6.7;
+					MARKETING_VERSION = 0.6.8;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";

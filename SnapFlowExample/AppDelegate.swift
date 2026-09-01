@@ -28,6 +28,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	private var commandTabHotKey: CommandTabHotKey?
 	private var networkSpeedMonitor: NetworkSpeedMonitor?
 	private var networkSpeedLabel: NSTextField?
+	private var clipboardMonitoringMenuItem: NSMenuItem?
+	private var clipboardMonitoringPreference = ClipboardMonitoringPreference()
 	private let clipboardHistoryManager = ClipboardHistoryManager(maxItems: 50)
 	private let shortcutActionsModel = ShortcutActionsModel()
 	private let updater = GitHubReleaseUpdater()
@@ -73,6 +75,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		let menu = NSMenu()
 		menu.addItem(NSMenuItem(title: "权限引导...", action: #selector(showPermissionGuideFromMenu), keyEquivalent: ""))
 		menu.addItem(NSMenuItem(title: "检查更新...", action: #selector(checkForUpdatesFromMenu), keyEquivalent: ""))
+		let clipboardMonitoringItem = NSMenuItem(
+			title: "启用剪贴板历史/PasteFlow",
+			action: #selector(toggleClipboardMonitoring),
+			keyEquivalent: ""
+		)
+		clipboardMonitoringItem.target = self
+		clipboardMonitoringMenuItem = clipboardMonitoringItem
+		menu.addItem(clipboardMonitoringItem)
+		updateClipboardMonitoringMenuItem()
 		let versionItem = NSMenuItem(title: AppVersionLabel.text(), action: nil, keyEquivalent: "")
 		versionItem.isEnabled = false
 		menu.addItem(versionItem)
@@ -163,6 +174,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 	@objc private func showPermissionGuideFromMenu() {
 		showPermissionGuide()
+	}
+
+	@objc private func toggleClipboardMonitoring() {
+		clipboardMonitoringPreference.isEnabled = !clipboardMonitoringPreference.isEnabled
+		applyClipboardMonitoringPreference()
+	}
+
+	private func applyClipboardMonitoringPreference() {
+		if clipboardMonitoringPreference.isEnabled {
+			clipboardHistoryManager.start()
+		} else {
+			clipboardHistoryManager.stop()
+			pasteFlowWindowController?.closeWindow()
+			clipboardHistoryWindowController?.closeWindow()
+		}
+		updateClipboardMonitoringMenuItem()
+	}
+
+	private func updateClipboardMonitoringMenuItem() {
+		clipboardMonitoringMenuItem?.state = clipboardMonitoringPreference.isEnabled ? .on : .off
 	}
 
 	private func showPermissionGuide() {
@@ -321,7 +352,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		clipboardHistoryManager.onNewClipboardText = { [weak self] text in
 			self?.showPasteFlowPanel(for: text)
 		}
-		clipboardHistoryManager.start()
+		applyClipboardMonitoringPreference()
 		SnapFlowKit.onKeyDown(for: .clipboardHistory) { [weak self] in
 			self?.handleClipboardHistoryHotKey()
 		}
@@ -395,6 +426,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 
 	private func showPasteFlowPanel(for text: String) {
+		guard clipboardMonitoringPreference.isEnabled else { return }
 		guard let type = PasteFlowDetector.detect(text) else { return }
 
 		pasteFlowWindowController?.closeWindow()
@@ -407,6 +439,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 	
 	private func handleClipboardHistoryHotKey() {
+		guard clipboardMonitoringPreference.isEnabled else { return }
+
 		if let controller = clipboardHistoryWindowController, controller.isVisible {
 			controller.activateAndFocus()
 			controller.selectNext()
@@ -1252,10 +1286,10 @@ final class ClipboardHistoryManager {
 	
 	func start() {
 		stop()
-		let timer = Timer(timeInterval: 0.35, repeats: true) { [weak self] _ in
+		let timer = Timer(timeInterval: 2, repeats: true) { [weak self] _ in
 			self?.pollPasteboard()
 		}
-		timer.tolerance = 0.1
+		timer.tolerance = 0.5
 		RunLoop.main.add(timer, forMode: .common)
 		self.timer = timer
 	}
