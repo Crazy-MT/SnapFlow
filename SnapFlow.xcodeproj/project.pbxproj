@@ -10,23 +10,6 @@
 		E3500C3624DEDCEF00F4B055 /* SnapFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3500C3524DEDCEF00F4B055 /* SnapFlowTests.swift */; };
 		E3500C3824DEDCEF00F4B055 /* SnapFlowKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapFlowKit::SnapFlowKit::Product" /* SnapFlowKit.framework */; };
 		E3500C3F24DEDDEC00F4B055 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3500C3E24DEDDEC00F4B055 /* Utilities.swift */; };
-		E7A000262A00000000000001 /* ClipboardMonitoringPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000272A00000000000001 /* ClipboardMonitoringPreference.swift */; };
-		E7A000242A00000000000001 /* ClipboardMonitoringPreferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000252A00000000000001 /* ClipboardMonitoringPreferenceTests.swift */; };
-		E7A000052A00000000000001 /* ClipboardHistorySelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */; };
-		E7A000072A00000000000001 /* ClipboardHistorySelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000082A00000000000001 /* ClipboardHistorySelection.swift */; };
-		E7A000092A00000000000001 /* ClipboardHistorySelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000082A00000000000001 /* ClipboardHistorySelection.swift */; };
-		E7A000012A00000000000001 /* SearchEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000002A00000000000001 /* SearchEngineTests.swift */; };
-		E7A000032A00000000000001 /* SearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000022A00000000000001 /* SearchEngine.swift */; };
-		E7A000042A00000000000001 /* SearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000022A00000000000001 /* SearchEngine.swift */; };
-		E7A000112A00000000000001 /* PasteFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000102A00000000000001 /* PasteFlowDetector.swift */; };
-		E7A000122A00000000000001 /* PasteFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000102A00000000000001 /* PasteFlowDetector.swift */; };
-		E7A000142A00000000000001 /* PasteFlowWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000132A00000000000001 /* PasteFlowWindowController.swift */; };
-		E7A000202A00000000000001 /* HyperSwitchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000212A00000000000001 /* HyperSwitchWindowController.swift */; };
-		E7A000222A00000000000001 /* PermissionGuideWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000232A00000000000001 /* PermissionGuideWindowController.swift */; };
-		E7A000162A00000000000001 /* PasteFlowDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */; };
-		E7A000182A00000000000001 /* GitHubReleaseUpdaterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */; };
-		E7A0001A2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */; };
-		E7A0001B2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */; };
 		E38103FE246449180023E9A8 /* Name.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38103FD246449180023E9A8 /* Name.swift */; };
 		E3AD497024705C7600F51C0D /* NSMenuItem++.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3AD496F24705C7600F51C0D /* NSMenuItem++.swift */; };
 		E3BF5627245C23840024D9BF /* Recorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3BF5626245C23840024D9BF /* Recorder.swift */; };
@@ -40,6 +23,23 @@
 		E3BF5646245C2D550024D9BF /* SnapFlowKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapFlowKit::SnapFlowKit::Product" /* SnapFlowKit.framework */; };
 		E3BF5647245C2D550024D9BF /* SnapFlowKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = "SnapFlowKit::SnapFlowKit::Product" /* SnapFlowKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E3BF564C245C34B30024D9BF /* Key.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3BF564B245C34B30024D9BF /* Key.swift */; };
+		E7A000012A00000000000001 /* SearchEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000002A00000000000001 /* SearchEngineTests.swift */; };
+		E7A000032A00000000000001 /* SearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000022A00000000000001 /* SearchEngine.swift */; };
+		E7A000042A00000000000001 /* SearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000022A00000000000001 /* SearchEngine.swift */; };
+		E7A000052A00000000000001 /* ClipboardHistorySelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */; };
+		E7A000072A00000000000001 /* ClipboardHistorySelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000082A00000000000001 /* ClipboardHistorySelection.swift */; };
+		E7A000092A00000000000001 /* ClipboardHistorySelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000082A00000000000001 /* ClipboardHistorySelection.swift */; };
+		E7A000112A00000000000001 /* PasteFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000102A00000000000001 /* PasteFlowDetector.swift */; };
+		E7A000122A00000000000001 /* PasteFlowDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000102A00000000000001 /* PasteFlowDetector.swift */; };
+		E7A000142A00000000000001 /* PasteFlowWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000132A00000000000001 /* PasteFlowWindowController.swift */; };
+		E7A000162A00000000000001 /* PasteFlowDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */; };
+		E7A000182A00000000000001 /* GitHubReleaseUpdaterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */; };
+		E7A0001A2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */; };
+		E7A0001B2A00000000000001 /* GitHubReleaseUpdater.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */; };
+		E7A000202A00000000000001 /* HyperSwitchWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000212A00000000000001 /* HyperSwitchWindowController.swift */; };
+		E7A000222A00000000000001 /* PermissionGuideWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000232A00000000000001 /* PermissionGuideWindowController.swift */; };
+		E7A000242A00000000000001 /* ClipboardMonitoringPreferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000252A00000000000001 /* ClipboardMonitoringPreferenceTests.swift */; };
+		E7A000262A00000000000001 /* ClipboardMonitoringPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A000272A00000000000001 /* ClipboardMonitoringPreference.swift */; };
 		OBJ_23 /* SnapFlowKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* SnapFlowKit.swift */; };
 		OBJ_24 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* util.swift */; };
 		OBJ_31 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
@@ -81,26 +81,13 @@
 		E3500C3524DEDCEF00F4B055 /* SnapFlowTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SnapFlowTests.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3500C3724DEDCEF00F4B055 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E3500C3E24DEDDEC00F4B055 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Utilities.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000272A00000000000001 /* ClipboardMonitoringPreference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardMonitoringPreference.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000252A00000000000001 /* ClipboardMonitoringPreferenceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardMonitoringPreferenceTests.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardHistorySelectionTests.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000082A00000000000001 /* ClipboardHistorySelection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardHistorySelection.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000002A00000000000001 /* SearchEngineTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SearchEngineTests.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000022A00000000000001 /* SearchEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SearchEngine.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000102A00000000000001 /* PasteFlowDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetector.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000132A00000000000001 /* PasteFlowWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000212A00000000000001 /* HyperSwitchWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = HyperSwitchWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000232A00000000000001 /* PermissionGuideWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PermissionGuideWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetectorTests.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdaterTests.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdater.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E38103FD246449180023E9A8 /* Name.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Name.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3AD496F24705C7600F51C0D /* NSMenuItem++.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = "NSMenuItem++.swift"; sourceTree = "<group>"; usesTabs = 1; };
 		E3BF5626245C23840024D9BF /* Recorder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Recorder.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3BF5628245C24450024D9BF /* RecorderCocoa.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = RecorderCocoa.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3BF562A245C28BD0024D9BF /* Shortcut.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Shortcut.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3BF562C245C29C30024D9BF /* CarbonSnapFlowKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = CarbonSnapFlowKit.swift; sourceTree = "<group>"; usesTabs = 1; };
-		E3BF5632245C2BB30024D9BF /* SnapFlowExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapFlowExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E3BF5632245C2BB30024D9BF /* SnapFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SnapFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3BF5634245C2BB30024D9BF /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3BF5636245C2BB30024D9BF /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ContentView.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3BF5638245C2BB50024D9BF /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -108,11 +95,24 @@
 		E3BF5640245C2BB50024D9BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E3BF5641245C2BB50024D9BF /* SnapFlowExample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SnapFlowExample.entitlements; sourceTree = "<group>"; };
 		E3BF564B245C34B30024D9BF /* Key.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Key.swift; sourceTree = "<group>"; usesTabs = 1; };
-		"SnapFlowKit::SnapFlowKit::Product" /* SnapFlowKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SnapFlowKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E7A000002A00000000000001 /* SearchEngineTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SearchEngineTests.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000022A00000000000001 /* SearchEngine.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SearchEngine.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000062A00000000000001 /* ClipboardHistorySelectionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardHistorySelectionTests.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000082A00000000000001 /* ClipboardHistorySelection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardHistorySelection.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000102A00000000000001 /* PasteFlowDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetector.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000132A00000000000001 /* PasteFlowWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000152A00000000000001 /* PasteFlowDetectorTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PasteFlowDetectorTests.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000172A00000000000001 /* GitHubReleaseUpdaterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdaterTests.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000192A00000000000001 /* GitHubReleaseUpdater.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GitHubReleaseUpdater.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000212A00000000000001 /* HyperSwitchWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = HyperSwitchWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000232A00000000000001 /* PermissionGuideWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = PermissionGuideWindowController.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000252A00000000000001 /* ClipboardMonitoringPreferenceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardMonitoringPreferenceTests.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E7A000272A00000000000001 /* ClipboardMonitoringPreference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ClipboardMonitoringPreference.swift; sourceTree = "<group>"; usesTabs = 1; };
 		OBJ_10 /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = util.swift; sourceTree = "<group>"; usesTabs = 1; };
 		OBJ_16 /* readme.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; lineEnding = 0; path = readme.md; sourceTree = "<group>"; usesTabs = 1; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; fileEncoding = 4; lineEnding = 0; path = Package.swift; sourceTree = "<group>"; usesTabs = 1; };
 		OBJ_9 /* SnapFlowKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SnapFlowKit.swift; sourceTree = "<group>"; usesTabs = 1; };
+		"SnapFlowKit::SnapFlowKit::Product" /* SnapFlowKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SnapFlowKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -188,7 +188,7 @@
 			isa = PBXGroup;
 			children = (
 				"SnapFlowKit::SnapFlowKit::Product" /* SnapFlowKit.framework */,
-				E3BF5632245C2BB30024D9BF /* SnapFlowExample.app */,
+				E3BF5632245C2BB30024D9BF /* SnapFlow.app */,
 				E3500C3324DEDCEF00F4B055 /* SnapFlowTests.xctest */,
 			);
 			name = Products;
@@ -271,7 +271,7 @@
 			);
 			name = SnapFlowExample;
 			productName = SnapFlowExample;
-			productReference = E3BF5632245C2BB30024D9BF /* SnapFlowExample.app */;
+			productReference = E3BF5632245C2BB30024D9BF /* SnapFlow.app */;
 			productType = "com.apple.product-type.application";
 		};
 		"SnapFlowKit::SnapFlowKit" /* SnapFlowKit */ = {
@@ -630,7 +630,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-					MARKETING_VERSION = 0.6.8;
+				MARKETING_VERSION = 0.6.9;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creazymt.snapflow;
@@ -700,7 +700,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-					MARKETING_VERSION = 0.6.8;
+				MARKETING_VERSION = 0.6.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.creazymt.snapflow;
@@ -728,7 +728,7 @@
 					"$(inherited)",
 					"$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
 				);
-					MARKETING_VERSION = 0.6.8;
+				MARKETING_VERSION = 0.6.8;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
@@ -763,7 +763,7 @@
 					"$(inherited)",
 					"$(TOOLCHAIN_DIR)/usr/lib/swift/macosx",
 				);
-					MARKETING_VERSION = 0.6.8;
+				MARKETING_VERSION = 0.6.8;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "$(inherited)";
