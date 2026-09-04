@@ -497,25 +497,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	private func commitClipboardHistoryItem(_ item: ClipboardHistoryItem, previousApplication: NSRunningApplication?) {
 		clipboardHistoryManager.setClipboardItem(item)
 		clipboardHistoryWindowController?.closeWindow()
-
+		
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
 			previousApplication?.activate(options: [])
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.08) {
-				self.sendPasteShortcut()
-			}
 		}
-	}
-
-	private func sendPasteShortcut() {
-		let source = CGEventSource(stateID: .hidSystemState)
-		let keyCode = CGKeyCode(9)
-		let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: true)
-		let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: false)
-
-		keyDown?.flags = .maskCommand
-		keyUp?.flags = .maskCommand
-		keyDown?.post(tap: .cghidEventTap)
-		keyUp?.post(tap: .cghidEventTap)
 	}
 	
 	private func handleSearch(_ query: String) {
@@ -1576,7 +1561,7 @@ final class ClipboardHistoryWindowController: NSWindowController, NSWindowDelega
 		titleLabel.textColor = .labelColor
 		contentView.addSubview(titleLabel)
 		
-		let hintLabel = NSTextField(labelWithString: "⌘⇧V 切换    ⏎ 粘贴到原输入框    Esc 关闭")
+		let hintLabel = NSTextField(labelWithString: "⌘⇧V 切换    ⏎ 复制并切回原 App    Esc 关闭")
 		hintLabel.translatesAutoresizingMaskIntoConstraints = false
 		hintLabel.font = NSFont.systemFont(ofSize: 11, weight: .medium)
 		hintLabel.textColor = .secondaryLabelColor

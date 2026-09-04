@@ -131,18 +131,18 @@ private struct PermissionGuideView: View {
 				Text("SnapFlow 只在需要的功能上申请权限。完成每一步后回到这里，状态会自动刷新。")
 					.foregroundColor(.secondary)
 					.fixedSize(horizontal: false, vertical: true)
-			}
+				}
 
-			PermissionStepView(
-				number: "1",
-				title: "辅助功能",
-				detail: "用于全局快捷键、双击 Command 搜索、切回原 App 后自动粘贴和窗口聚焦。",
-				isGranted: model.hasAccessibilityAccess,
-				buttonTitle: "打开辅助功能设置"
-			) {
-				SnapFlowPermissionGuide.requestAccessibilityAccess()
-				model.refresh()
-			}
+				PermissionStepView(
+					number: "1",
+					title: "辅助功能",
+					detail: "用于全局快捷键、双击 Command 搜索和窗口聚焦。",
+					isGranted: model.hasAccessibilityAccess,
+					buttonTitle: "打开辅助功能设置"
+				) {
+					SnapFlowPermissionGuide.requestAccessibilityAccess()
+					model.refresh()
+				}
 
 			PermissionStepView(
 				number: "2",

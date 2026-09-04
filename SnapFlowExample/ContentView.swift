@@ -121,25 +121,25 @@ struct ContentView: View {
 							.font(.headline)
 							.fontWeight(.semibold)
 
-						UsageGuideRow(
-							title: "快捷键设置",
-							detail: "在下方每一行点击录制框设置快捷键，再点击“浏览...”选择要打开的 App 或要运行的脚本。按下快捷键后会执行对应路径。"
-						)
+							UsageGuideRow(
+								title: "快捷键设置",
+								detail: "在下方每一行点击录制框设置快捷键，再点击“浏览...”选择要打开的 App 或要运行的脚本。按下快捷键后会执行对应路径。"
+							)
 
-						UsageGuideRow(
-							title: "快速搜索",
-							detail: "双击 Command 打开搜索框。输入关键词直接搜索，也可以使用 pub xxx 或 github xxx 快速搜索对应站点。"
-						)
+							UsageGuideRow(
+								title: "快速搜索",
+								detail: "双击 Command 打开搜索框。输入关键词直接搜索，也可以使用 pub xxx 或 github xxx 快速搜索对应站点。"
+							)
 
-						UsageGuideRow(
-							title: "剪贴板历史",
-							detail: "按 Command + Shift + V 打开最近复制内容，选择后回车会切回原 App 并粘贴。"
-						)
+							UsageGuideRow(
+								title: "剪贴板历史",
+								detail: "按 Command + Shift + V 打开最近复制内容，选择后回车会切回原 App，并只复制到剪贴板。"
+							)
 
-						UsageGuideRow(
-							title: "窗口切换",
-							detail: "按住 Command 后按 Tab 打开横向窗口列表，继续按 Tab 选择下一个窗口，松开 Command 切换到当前选中窗口。"
-						)
+							UsageGuideRow(
+								title: "窗口切换",
+								detail: "按住 Command 后按 Tab 打开横向窗口列表，继续按 Tab 选择下一个窗口，松开 Command 切换到当前选中窗口。"
+							)
 
 						UsageGuideRow(
 							title: "PasteFlow 智能动作",
