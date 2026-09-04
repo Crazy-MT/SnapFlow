@@ -20,4 +20,16 @@ final class ClipboardMonitoringPreferenceTests: XCTestCase {
 
 		XCTAssertFalse(ClipboardMonitoringPreference(defaults: defaults).isEnabled)
 	}
+
+	func testNetworkSpeedDefaultsToEnabled() {
+		XCTAssertTrue(NetworkSpeedPreference(defaults: defaults).isEnabled)
+	}
+
+	func testNetworkSpeedPersistsDisabledState() {
+		var preference = NetworkSpeedPreference(defaults: defaults)
+
+		preference.isEnabled = false
+
+		XCTAssertFalse(NetworkSpeedPreference(defaults: defaults).isEnabled)
+	}
 }

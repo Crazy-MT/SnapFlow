@@ -28,6 +28,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	private var commandTabHotKey: CommandTabHotKey?
 	private var networkSpeedMonitor: NetworkSpeedMonitor?
 	private var networkSpeedLabel: NSTextField?
+	private var networkSpeedMenuItem: NSMenuItem?
+	private var networkSpeedPreference = NetworkSpeedPreference()
 	private var clipboardMonitoringMenuItem: NSMenuItem?
 	private var clipboardMonitoringPreference = ClipboardMonitoringPreference()
 	private let clipboardHistoryManager = ClipboardHistoryManager(maxItems: 50)
@@ -70,11 +72,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 			button.action = #selector(toggleShortcutsPopover)
 			button.sendAction(on: [.leftMouseUp, .rightMouseUp])
 		}
-		startNetworkSpeedMonitor()
 
 		let menu = NSMenu()
 		menu.addItem(NSMenuItem(title: "权限引导...", action: #selector(showPermissionGuideFromMenu), keyEquivalent: ""))
 		menu.addItem(NSMenuItem(title: "检查更新...", action: #selector(checkForUpdatesFromMenu), keyEquivalent: ""))
+		let networkSpeedItem = NSMenuItem(
+			title: "显示菜单栏网速",
+			action: #selector(toggleNetworkSpeed),
+			keyEquivalent: ""
+		)
+		networkSpeedItem.target = self
+		networkSpeedMenuItem = networkSpeedItem
+		menu.addItem(networkSpeedItem)
 		let clipboardMonitoringItem = NSMenuItem(
 			title: "启用剪贴板历史/PasteFlow",
 			action: #selector(toggleClipboardMonitoring),
@@ -90,6 +99,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		menu.addItem(NSMenuItem.separator())
 		menu.addItem(NSMenuItem(title: "Quit", action: #selector(quitApp), keyEquivalent: "q"))
 		statusMenu = menu
+		applyNetworkSpeedPreference()
 	}
 
 	private func configureStatusBarButton(_ button: NSStatusBarButton) {
@@ -174,6 +184,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 	@objc private func showPermissionGuideFromMenu() {
 		showPermissionGuide()
+	}
+
+	@objc private func toggleNetworkSpeed() {
+		networkSpeedPreference.isEnabled = !networkSpeedPreference.isEnabled
+		applyNetworkSpeedPreference()
+	}
+
+	private func applyNetworkSpeedPreference() {
+		if networkSpeedPreference.isEnabled {
+			networkSpeedLabel?.isHidden = false
+			startNetworkSpeedMonitor()
+		} else {
+			networkSpeedMonitor?.stop()
+			networkSpeedMonitor = nil
+			networkSpeedLabel?.isHidden = true
+		}
+		updateNetworkSpeedMenuItem()
+	}
+
+	private func updateNetworkSpeedMenuItem() {
+		networkSpeedMenuItem?.state = networkSpeedPreference.isEnabled ? .on : .off
 	}
 
 	@objc private func toggleClipboardMonitoring() {
@@ -510,6 +541,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 
 	private func startNetworkSpeedMonitor() {
+		guard networkSpeedMonitor == nil else { return }
 		let monitor = NetworkSpeedMonitor { [weak self] speed in
 			self?.networkSpeedLabel?.stringValue = NetworkSpeedMonitor.format(speed)
 		}
@@ -547,10 +579,10 @@ final class NetworkSpeedMonitor {
 		previousSnapshot = Self.currentSnapshot()
 		onUpdate(NetworkSpeed(uploadBytesPerSecond: 0, downloadBytesPerSecond: 0))
 
-		let timer = Timer(timeInterval: 1, repeats: true) { [weak self] _ in
+		let timer = Timer(timeInterval: 2, repeats: true) { [weak self] _ in
 			self?.poll()
 		}
-		timer.tolerance = 0.2
+		timer.tolerance = 1
 		RunLoop.main.add(timer, forMode: .common)
 		self.timer = timer
 	}
