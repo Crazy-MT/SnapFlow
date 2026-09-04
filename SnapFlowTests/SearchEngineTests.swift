@@ -15,6 +15,22 @@ final class SearchEngineTests: XCTestCase {
 		)
 	}
 
+	func testQuickSearchCalculatesArithmeticExpression() {
+		XCTAssertEqual(QuickSearchCalculator.result(for: "1 + 2 * (3 + 4)"), "15")
+	}
+
+	func testQuickSearchCalculatesDecimalExpression() {
+		XCTAssertEqual(QuickSearchCalculator.result(for: "1 / 4"), "0.25")
+	}
+
+	func testQuickSearchIgnoresPlainSearchText() {
+		XCTAssertNil(QuickSearchCalculator.result(for: "swift keyboard"))
+	}
+
+	func testQuickSearchIgnoresDivisionByZero() {
+		XCTAssertNil(QuickSearchCalculator.result(for: "1 / 0"))
+	}
+
 	func testApplicationSearchPrefersPrefixMatch() {
 		let results = ApplicationSearchResult.filtered(
 			[

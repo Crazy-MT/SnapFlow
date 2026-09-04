@@ -184,3 +184,89 @@ enum SearchEngine: String, CaseIterable {
 		}
 	}
 }
+
+enum QuickSearchCalculator {
+	static func result(for query: String) -> String? {
+		let expression = query.filter { !$0.isWhitespace }
+		guard expression.containsArithmeticOperator else { return nil }
+		guard expression.allSatisfy({ "0123456789.+-*/()".contains($0) }) else { return nil }
+
+		var parser = Parser(expression)
+		guard let value = parser.parse(), value.isFinite else { return nil }
+		if abs(value.rounded() - value) < 0.000000001 {
+			return "\(Int(value.rounded()))"
+		}
+		return "\(value)"
+	}
+
+	private struct Parser {
+		private let characters: [Character]
+		private var index = 0
+
+		init(_ expression: String) {
+			characters = Array(expression)
+		}
+
+		mutating func parse() -> Double? {
+			guard let value = parseExpression(), index == characters.count else { return nil }
+			return value
+		}
+
+		private mutating func parseExpression() -> Double? {
+			guard var value = parseTerm() else { return nil }
+			while match("+") || match("-") {
+				let operation = characters[index - 1]
+				guard let next = parseTerm() else { return nil }
+				value = operation == "+" ? value + next : value - next
+			}
+			return value
+		}
+
+		private mutating func parseTerm() -> Double? {
+			guard var value = parseFactor() else { return nil }
+			while match("*") || match("/") {
+				let operation = characters[index - 1]
+				guard let next = parseFactor() else { return nil }
+				if operation == "/" {
+					guard next != 0 else { return nil }
+					value /= next
+				} else {
+					value *= next
+				}
+			}
+			return value
+		}
+
+		private mutating func parseFactor() -> Double? {
+			if match("-") {
+				return parseFactor().map { -$0 }
+			}
+			if match("+") {
+				return parseFactor()
+			}
+			if match("(") {
+				guard let value = parseExpression(), match(")") else { return nil }
+				return value
+			}
+
+			let start = index
+			while index < characters.count, characters[index].isNumber || characters[index] == "." {
+				index += 1
+			}
+			guard start != index else { return nil }
+			return Double(String(characters[start..<index]))
+		}
+
+		private mutating func match(_ character: Character) -> Bool {
+			guard index < characters.count, characters[index] == character else { return false }
+			index += 1
+			return true
+		}
+	}
+}
+
+private extension String {
+	var containsArithmeticOperator: Bool {
+		contains("+") || contains("*") || contains("/") || dropFirst().contains("-")
+	}
+}

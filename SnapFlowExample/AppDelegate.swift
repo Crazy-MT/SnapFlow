@@ -508,7 +508,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		
 		let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
 		
-		if trimmedQuery.hasPrefix("pub ") {
+		if let result = QuickSearchCalculator.result(for: trimmedQuery) {
+			copySearchCalculationResult(result, expression: trimmedQuery)
+		} else if trimmedQuery.hasPrefix("pub ") {
 			let searchTerm = trimmedQuery.dropFirst(4).trimmingCharacters(in: .whitespaces)
 			if let url = URL(string: "https://pub.dev/packages?q=\(searchTerm.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? searchTerm)") {
 				NSWorkspace.shared.open(url)
@@ -523,6 +525,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 				NSWorkspace.shared.open(url)
 			}
 		}
+	}
+
+	private func copySearchCalculationResult(_ result: String, expression: String) {
+		let pasteboard = NSPasteboard.general
+		pasteboard.clearContents()
+		pasteboard.setString(result, forType: .string)
+
+		let notification = NSUserNotification()
+		notification.title = "\(expression) = \(result)"
+		notification.informativeText = "结果已复制"
+		NSUserNotificationCenter.default.deliver(notification)
 	}
 
 	private func startNetworkSpeedMonitor() {
