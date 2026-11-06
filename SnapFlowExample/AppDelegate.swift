@@ -135,7 +135,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 			iconView.heightAnchor.constraint(equalToConstant: 18),
 
 			label.leadingAnchor.constraint(equalTo: iconView.trailingAnchor, constant: 2),
-			label.trailingAnchor.constraint(equalTo: button.trailingAnchor, constant: -4),
 			label.widthAnchor.constraint(equalToConstant: 44),
 			label.centerYAnchor.constraint(equalTo: button.centerYAnchor),
 			label.heightAnchor.constraint(equalToConstant: 20)
@@ -192,6 +191,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	}
 
 	private func applyNetworkSpeedPreference() {
+		statusItem.length = networkSpeedPreference.isEnabled ? 72 : 26
 		if networkSpeedPreference.isEnabled {
 			networkSpeedLabel?.isHidden = false
 			startNetworkSpeedMonitor()
